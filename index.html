@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Microsoft SLA Outage Guide — ประเมินและเคลม SLA</title>
+  <style>
+    :root {
+      --ms-blue: #0078d4;
+      --ms-dark: #004578;
+      --ms-light: #deecf9;
+      --ms-green: #107c10;
+      --ms-red: #d13438;
+      --ms-yellow: #ffd335;
+      --ms-gray: #605e5c;
+      --ms-bg: #f3f2f1;
+      --white: #ffffff;
+      --radius: 8px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", "Noto Sans Thai", sans-serif;
+      background: var(--ms-bg);
+      color: #323130;
+      line-height: 1.65;
+    }
+
+    /* ---- HEADER ---- */
+    header {
+      background: linear-gradient(135deg, var(--ms-dark) 0%, var(--ms-blue) 100%);
+      color: var(--white);
+      padding: 2rem 1.5rem 1.8rem;
+      text-align: center;
+    }
+    header .logo { font-size: 2.4rem; font-weight: 700; letter-spacing: -1px; }
+    header .logo span { color: var(--ms-yellow); }
+    header p { opacity: .85; margin-top: .4rem; font-size: 1.05rem; }
+    header .badge {
+      display: inline-block;
+      margin-top: .8rem;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 20px;
+      padding: .25rem .9rem;
+      font-size: .82rem;
+    }
+
+    /* ---- NAV TABS ---- */
+    nav.tabs {
+      background: var(--ms-dark);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: .3rem;
+      padding: .5rem 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    nav.tabs a {
+      color: rgba(255,255,255,.75);
+      text-decoration: none;
+      padding: .4rem .9rem;
+      border-radius: 20px;
+      font-size: .88rem;
+      transition: all .2s;
+    }
+    nav.tabs a:hover, nav.tabs a.active {
+      background: var(--ms-blue);
+      color: var(--white);
+    }
+
+    /* ---- LAYOUT ---- */
+    main { max-width: 940px; margin: 2rem auto; padding: 0 1rem 4rem; }
+
+    section { margin-bottom: 2.4rem; }
+
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--ms-dark);
+      border-left: 5px solid var(--ms-blue);
+      padding-left: .75rem;
+      margin-bottom: 1.1rem;
+    }
+    h3 { font-size: 1.08rem; font-weight: 600; color: var(--ms-dark); margin: 1.2rem 0 .5rem; }
+
+    /* ---- CARDS ---- */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.4rem 1.6rem;
+      margin-bottom: 1rem;
+    }
+    .card.blue-top  { border-top: 4px solid var(--ms-blue); }
+    .card.green-top { border-top: 4px solid var(--ms-green); }
+    .card.red-top   { border-top: 4px solid var(--ms-red); }
+    .card.yellow-top{ border-top: 4px solid #ca5010; }
+
+    /* ---- GRID ---- */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media(max-width:640px){ .grid-2 { grid-template-columns: 1fr; } }
+
+    /* ---- ALERT BOXES ---- */
+    .alert {
+      border-radius: var(--radius);
+      padding: .9rem 1.1rem;
+      margin: .8rem 0;
+      display: flex;
+      gap: .75rem;
+      align-items: flex-start;
+      font-size: .93rem;
+    }
+    .alert .icon { font-size: 1.3rem; flex-shrink: 0; }
+    .alert.info  { background: var(--ms-light); border-left: 4px solid var(--ms-blue); }
+    .alert.warn  { background: #fff4ce; border-left: 4px solid #ca5010; }
+    .alert.danger{ background: #fde7e9; border-left: 4px solid var(--ms-red); }
+    .alert.ok    { background: #dff6dd; border-left: 4px solid var(--ms-green); }
+
+    /* ---- STEPS ---- */
+    .steps { counter-reset: step; }
+    .step {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      align-items: flex-start;
+    }
+    .step-num {
+      counter-increment: step;
+      min-width: 36px;
+      height: 36px;
+      background: var(--ms-blue);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step-num::before { content: counter(step); }
+    .step-body { flex: 1; padding-top: .4rem; }
+    .step-body strong { display: block; margin-bottom: .25rem; color: var(--ms-dark); }
+
+    /* ---- TABLE ---- */
+    .tbl-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .9rem;
+    }
+    th {
+      background: var(--ms-dark);
+      color: var(--white);
+      padding: .65rem .9rem;
+      text-align: left;
+    }
+    td { padding: .6rem .9rem; border-bottom: 1px solid #edebe9; }
+    tr:nth-child(even) td { background: var(--ms-light); }
+
+    /* ---- BADGE / TAG ---- */
+    .tag {
+      display: inline-block;
+      border-radius: 12px;
+      padding: .15rem .65rem;
+      font-size: .8rem;
+      font-weight: 600;
+    }
+    .tag-blue  { background: var(--ms-light); color: var(--ms-dark); }
+    .tag-green { background: #dff6dd; color: #0a4d0a; }
+    .tag-red   { background: #fde7e9; color: #8a0007; }
+    .tag-orange{ background: #fff4ce; color: #7a3c00; }
+
+    /* ---- TIMELINE ---- */
+    .timeline { position: relative; padding-left: 2rem; }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: .6rem;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: var(--ms-blue);
+    }
+    .tl-item {
+      position: relative;
+      margin-bottom: 1.2rem;
+    }
+    .tl-item::before {
+      content: "";
+      position: absolute;
+      left: -1.75rem;
+      top: .35rem;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--ms-blue);
+      border: 2px solid var(--white);
+      box-shadow: 0 0 0 2px var(--ms-blue);
+    }
+
+    /* ---- SOURCES ---- */
+    .source-link {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .6rem .9rem;
+      background: var(--ms-light);
+      border-radius: var(--radius);
+      text-decoration: none;
+      color: var(--ms-dark);
+      font-size: .88rem;
+      margin-bottom: .6rem;
+      transition: background .2s;
+    }
+    .source-link:hover { background: #c7e0f4; }
+    .source-link .src-icon { font-size: 1.1rem; }
+    .source-link .src-url { font-size: .77rem; opacity: .6; display: block; }
+
+    /* ---- CHECKLIST ---- */
+    .checklist { list-style: none; }
+    .checklist li {
+      padding: .45rem 0;
+      border-bottom: 1px solid #edebe9;
+      display: flex;
+      gap: .6rem;
+      align-items: flex-start;
+    }
+    .checklist li:last-child { border: none; }
+    .checklist .cb {
+      width: 20px; height: 20px;
+      border: 2px solid var(--ms-blue);
+      border-radius: 3px;
+      flex-shrink: 0;
+      margin-top: .15rem;
+    }
+
+    /* ---- CALC BOX ---- */
+    .calc-box {
+      background: #1b1b1b;
+      color: #e8f4fd;
+      border-radius: var(--radius);
+      padding: 1.1rem 1.4rem;
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: .9rem;
+      margin: .8rem 0;
+    }
+    .calc-box .comment { color: #6fbf73; }
+    .calc-box .formula { color: var(--ms-yellow); font-weight: 600; }
+    .calc-box .result  { color: #79c0ff; }
+
+    /* ---- CALCULATOR ---- */
+    .calc-section { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.6rem; }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+    @media(max-width:640px){ .calc-grid { grid-template-columns: 1fr; } }
+
+    .field { display: flex; flex-direction: column; gap: .35rem; }
+    .field label { font-size: .85rem; font-weight: 600; color: var(--ms-dark); }
+    .field .hint { font-size: .75rem; color: var(--ms-gray); margin-top: -.2rem; }
+
+    .field select,
+    .field input[type="number"],
+    .field input[type="text"] {
+      border: 1.5px solid #c8c6c4;
+      border-radius: 6px;
+      padding: .55rem .75rem;
+      font-size: .95rem;
+      font-family: inherit;
+      transition: border-color .2s;
+      background: #faf9f8;
+    }
+    .field select:focus,
+    .field input:focus { outline: none; border-color: var(--ms-blue); background: var(--white); }
+
+    .field-full { grid-column: 1 / -1; }
+
+    .downtime-row { display: flex; gap: .6rem; align-items: center; }
+    .downtime-row input { flex: 1; }
+    .downtime-row span { font-size: .88rem; color: var(--ms-gray); white-space: nowrap; }
+
+    .btn-calc {
+      display: block;
+      width: 100%;
+      padding: .85rem;
+      background: var(--ms-blue);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background .2s;
+      margin-top: .4rem;
+    }
+    .btn-calc:hover { background: var(--ms-dark); }
+    .btn-calc:active { transform: scale(.99); }
+
+    .btn-reset {
+      display: block;
+      width: 100%;
+      padding: .6rem;
+      background: transparent;
+      color: var(--ms-gray);
+      border: 1.5px solid #c8c6c4;
+      border-radius: var(--radius);
+      font-size: .88rem;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: .5rem;
+      transition: all .2s;
+    }
+    .btn-reset:hover { border-color: var(--ms-blue); color: var(--ms-blue); }
+
+    /* Result panel */
+    #calc-result {
+      display: none;
+      margin-top: 1.4rem;
+      border-top: 2px solid #edebe9;
+      padding-top: 1.2rem;
+      animation: fadeIn .35s ease;
+    }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+    .result-hero {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .result-pct {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .result-pct.ok    { color: var(--ms-green); }
+    .result-pct.warn  { color: #ca5010; }
+    .result-pct.fail  { color: var(--ms-red); }
+
+    .result-verdict {
+      border-radius: var(--radius);
+      padding: .6rem 1.2rem;
+      font-weight: 700;
+      font-size: 1rem;
+      text-align: center;
+    }
+    .result-verdict.ok   { background: #dff6dd; color: #0a4d0a; }
+    .result-verdict.warn { background: #fff4ce; color: #7a3c00; }
+    .result-verdict.fail { background: #fde7e9; color: #8a0007; }
+
+    .result-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: .7rem;
+      margin-bottom: 1rem;
+    }
+    .stat-box {
+      background: var(--ms-bg);
+      border-radius: 6px;
+      padding: .75rem 1rem;
+      text-align: center;
+    }
+    .stat-box .stat-val { font-size: 1.3rem; font-weight: 700; color: var(--ms-dark); }
+    .stat-box .stat-lbl { font-size: .77rem; color: var(--ms-gray); margin-top: .15rem; }
+
+    .credit-box {
+      border-radius: var(--radius);
+      padding: 1rem 1.3rem;
+      text-align: center;
+      margin-top: .4rem;
+    }
+    .credit-box.none   { background: #dff6dd; }
+    .credit-box.tier1  { background: #fff4ce; }
+    .credit-box.tier2  { background: #fde7e9; }
+    .credit-box .credit-pct  { font-size: 2rem; font-weight: 800; }
+    .credit-box.none   .credit-pct { color: var(--ms-green); }
+    .credit-box.tier1  .credit-pct { color: #ca5010; }
+    .credit-box.tier2  .credit-pct { color: var(--ms-red); }
+    .credit-box .credit-amt  { font-size: 1.1rem; font-weight: 600; margin-top: .2rem; }
+    .credit-box .credit-note { font-size: .82rem; color: var(--ms-gray); margin-top: .3rem; }
+
+    .deadline-box {
+      background: var(--ms-light);
+      border-radius: 6px;
+      padding: .7rem 1rem;
+      font-size: .9rem;
+      margin-top: .8rem;
+      display: flex;
+      gap: .5rem;
+      align-items: center;
+    }
+    .deadline-box strong { color: var(--ms-dark); }
+
+    /* Gauge bar */
+    .gauge-wrap { margin: .8rem 0; }
+    .gauge-track {
+      height: 14px;
+      background: #edebe9;
+      border-radius: 7px;
+      overflow: hidden;
+      position: relative;
+    }
+    .gauge-fill {
+      height: 100%;
+      border-radius: 7px;
+      transition: width .6s cubic-bezier(.4,0,.2,1), background .4s;
+    }
+    .gauge-labels { display: flex; justify-content: space-between; font-size: .75rem; color: var(--ms-gray); margin-top: .2rem; }
+
+    /* ---- FOOTER ---- */
+    footer {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      font-size: .82rem;
+      color: var(--ms-gray);
+      border-top: 1px solid #edebe9;
+      margin-top: 2rem;
+    }
+    footer a { color: var(--ms-blue); }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">&#xe2b1; Microsoft <span>SLA</span> Outage Guide</div>
+  <p>คู่มือประเมิน SLA และการเคลม Service Credit เมื่อ Microsoft Service เกิด Outage</p>
+  <span class="badge">อ้างอิงจาก Microsoft.com เท่านั้น &nbsp;|&nbsp; อัปเดต 2025–2026</span>
+</header>
+
+<!-- TAB NAV -->
+<nav class="tabs">
+  <a href="#overview" class="active">ภาพรวม SLA</a>
+  <a href="#detect">ตรวจจับ Outage</a>
+  <a href="#evaluate">ประเมิน SLA</a>
+  <a href="#evidence">รวบรวมหลักฐาน</a>
+  <a href="#claim">ขอเคลม</a>
+  <a href="#deadline">กำหนดเวลา</a>
+  <a href="#calculator">&#129518; คำนวณ SLA</a>
+  <a href="#abbrev">รหัส Incident</a>
+  <a href="#sources">แหล่งอ้างอิง</a>
+</nav>
+
+<main>
+
+  <!-- ====== OVERVIEW ====== -->
+  <section id="overview">
+    <h2>&#127775; ภาพรวม: Microsoft SLA คืออะไร</h2>
+    <div class="card blue-top">
+      <p>
+        <strong>Service Level Agreement (SLA)</strong> คือสัญญาที่ Microsoft ให้ไว้กับลูกค้าเกี่ยวกับ <em>uptime และ connectivity</em>
+        ของ Online Services ต่าง ๆ เช่น Azure, Microsoft 365, Dynamics 365 และ Intune
+      </p>
+      <p style="margin-top:.7rem">
+        SLA ครอบคลุมบริการ: <strong>Azure</strong> &nbsp;|&nbsp; <strong>Microsoft 365</strong> &nbsp;|&nbsp;
+        <strong>Dynamics 365</strong> &nbsp;|&nbsp; <strong>Enterprise Mobility Suite</strong>
+      </p>
+    </div>
+
+    <h3>สูตรคำนวณ Monthly Uptime Percentage</h3>
+    <div class="calc-box">
+      <span class="comment"># สูตรมาตรฐาน Microsoft</span><br>
+      <span class="formula">Monthly Uptime %</span> =
+      (Total Billable Minutes − Downtime Minutes) ÷ Total Billable Minutes × 100<br><br>
+      <span class="comment"># ตัวอย่าง: เดือนมี 43,200 นาที, เกิด Downtime 120 นาที</span><br>
+      <span class="result">= (43200 − 120) ÷ 43200 × 100 = 99.72%</span>
+    </div>
+
+    <div class="alert warn">
+      <span class="icon">&#9888;&#65039;</span>
+      <div>
+        <strong>ข้อควรทราบ:</strong> SLA วัดตาม <em>definition ของ Microsoft</em> ไม่ใช่ตาม perception ของลูกค้า
+        เวลา Maintenance ที่นัดไว้ล่วงหน้า, เหตุสุดวิสัย (force majeure), หรือ configuration ของลูกค้าเองที่ไม่ถูกต้อง
+        จะ <strong>ไม่</strong>นับเป็น Downtime ตาม SLA
+      </div>
+    </div>
+
+    <h3>ตาราง Credit ที่ได้รับ (ตัวอย่าง Standard Tier)</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Monthly Uptime Percentage</th><th>Service Credit ที่ได้รับ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>≥ 99.9%</td><td><span class="tag tag-green">ไม่ได้ Credit</span> — เป็นไปตาม SLA</td></tr>
+          <tr><td>&lt; 99.9%</td><td><span class="tag tag-orange">10%</span> ของค่าบริการรายเดือน</td></tr>
+          <tr><td>&lt; 99%</td><td><span class="tag tag-red">25%</span> ของค่าบริการรายเดือน</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.82rem;color:var(--ms-gray);margin-top:.4rem">
+      * อัตรา Credit จริงขึ้นอยู่กับ service tier — ดูเอกสาร SLA ฉบับล่าสุดจาก microsoft.com/licensing
+    </p>
+  </section>
+
+  <!-- ====== DETECT ====== -->
+  <section id="detect">
+    <h2>&#128270; ขั้นตอนที่ 1 — ตรวจจับ Outage</h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <strong>เปิด Service Health Dashboard</strong>
+          ไปที่ <code>Microsoft 365 Admin Center → Health → Service Health</code>
+          หรือ Azure Portal → Help + support → Service Health
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <strong>จดบันทึก Incident ID</strong>
+          รหัส Incident จะอยู่ในรูปแบบ <code>EX25194</code> (ตัวอักษร 2 ตัว + ตัวเลข)
+          ดูตารางรหัสบริการด้านล่าง
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <strong>อ่าน Post Incident Review (PIR)</strong>
+          หลัง Incident ปิด Microsoft จะออก PIR ซึ่งระบุ root cause, timeline และผลกระทบอย่างเป็นทางการ
+        </div>
+      </div>
+    </div>
+
+    <div class="alert info">
+      <span class="icon">&#8505;&#65039;</span>
+      <div>
+        <strong>Advisory Incidents ≠ SLA Credit:</strong>
+        Incident ที่ระบุว่า "Advisory" (อาจได้รับผลกระทบ) โดยปกติ <strong>ไม่มีสิทธิ์</strong>ขอ SLA Credit
+        ต้องเป็น Incident ที่ระบุว่า tenant ของคุณ <em>ได้รับผลกระทบจริง</em>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== EVALUATE ====== -->
+  <section id="evaluate">
+    <h2>&#128202; ขั้นตอนที่ 2 — ประเมิน SLA (5-Pass Method)</h2>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>&#128272; Pass 1: Definitions</h3>
+        <p>อ่านนิยามของ <em>Downtime, Valid Request, Total Billable Minutes</em> ในเอกสาร SLA ก่อนเสมอ
+        — นิยามเหล่านี้กำหนดว่าอะไรนับเป็น failure จริง</p>
+      </div>
+      <div class="card">
+        <h3>&#128200; Pass 2: Measurement</h3>
+        <p>ทำความเข้าใจวิธีคำนวณ — time-based vs. request-based, retry requirement,
+        และ aggregation scope (per instance หรือ across subscription)</p>
+      </div>
+      <div class="card">
+        <h3>&#10060; Pass 3: Exclusions</h3>
+        <p>ระบุเงื่อนไขที่ <strong>ไม่</strong>ครอบคลุม: planned maintenance, force majeure,
+        customer misconfiguration, exceeded quota, preview features</p>
+      </div>
+      <div class="card">
+        <h3>&#128161; Pass 4: Design Signals</h3>
+        <p>ใช้ SLA เป็น input สำหรับ architecture — เช่น ถ้า SLA ต้องการ retry logic
+        ให้ implement ก่อน ไม่เช่นนั้น failure จะไม่นับใน SLA</p>
+      </div>
+    </div>
+
+    <div class="card blue-top" style="margin-top:.5rem">
+      <h3>&#128203; Pass 5: ตรวจสอบว่า Incident ละเมิด SLA หรือไม่</h3>
+      <div class="steps" style="margin-top:.8rem">
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-body">
+            <strong>คำนวณ Monthly Uptime % จากข้อมูลจริง</strong>
+            ใช้สูตร: <code>(Total Billable Min − Downtime Min) ÷ Total Billable Min × 100</code>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-body">
+            <strong>หักเวลาที่ไม่นับ</strong>
+            ลบ planned maintenance, excluded events, และช่วงที่ configuration ไม่ตรงตาม prerequisite
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-body">
+            <strong>เปรียบเทียบกับ SLA Threshold</strong>
+            ถ้าตัวเลขต่ำกว่า committed % (เช่น 99.9%) คุณมีสิทธิ์ยื่นขอ Credit
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== EVIDENCE ====== -->
+  <section id="evidence">
+    <h2>&#128196; ขั้นตอนที่ 3 — รวบรวมหลักฐาน</h2>
+
+    <div class="card green-top">
+      <h3>หลักฐานที่ต้องเตรียมก่อนยื่นเคลม</h3>
+      <ul class="checklist">
+        <li><span class="cb"></span><div><strong>Customer Tenant GUID</strong> — ID ของ tenant ที่ได้รับผลกระทบ</div></li>
+        <li><span class="cb"></span><div><strong>Outage Incident Identifier</strong> — เช่น <code>EX25194</code> จาก Service Health Dashboard</div></li>
+        <li><span class="cb"></span><div><strong>Timestamps</strong> — เวลาเริ่มและสิ้นสุด Incident พร้อม timezone</div></li>
+        <li><span class="cb"></span><div><strong>Error Details</strong> — Error codes, error messages, timeout behaviors ที่พบ</div></li>
+        <li><span class="cb"></span><div><strong>Request Logs</strong> — Log ที่แสดง retry attempts (ถ้า SLA กำหนดให้ retry)</div></li>
+        <li><span class="cb"></span><div><strong>จำนวนและที่ตั้งของ Users</strong> ที่ได้รับผลกระทบ</div></li>
+        <li><span class="cb"></span><div><strong>Email จากลูกค้า</strong> — ต้องส่งจาก domain ของ tenant ที่ได้รับผลกระทบ (ไม่รับ personal email)</div></li>
+        <li><span class="cb"></span><div><strong>Support Ticket Number</strong> — เลข ticket ที่เปิดไว้กับ Microsoft</div></li>
+        <li><span class="cb"></span><div><strong>ซื้อผ่าน CSP?</strong> — ระบุว่า subscription ซื้อผ่าน Cloud Solution Provider หรือไม่</div></li>
+      </ul>
+    </div>
+
+    <div class="alert danger">
+      <span class="icon">&#10060;</span>
+      <div>
+        <strong>ไม่เพียงพอ:</strong> ชื่อลูกค้า, Tenant ID, Partner Ticket Number และ Ticket Timestamp
+        <strong>ไม่เพียงพอ</strong>สำหรับ process credit — ต้องมีหลักฐานจากรายการด้านบนครบถ้วน
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== CLAIM ====== -->
+  <section id="claim">
+    <h2>&#127381; ขั้นตอนที่ 4 — วิธีการเคลม SLA Credit</h2>
+
+    <div class="grid-2">
+      <!-- Azure -->
+      <div class="card blue-top">
+        <h3>&#9729;&#65039; Microsoft Azure</h3>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">Sign in ที่ <strong>Azure Portal</strong> ด้วย account ที่ได้รับผลกระทบ</div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">ไปที่ <strong>Help + Support → New Support Request</strong></div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">เลือก <strong>Issue type: Billing</strong> → Problem type: <strong>Refund Request</strong></div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">ระบุว่าขอ SLA credit พร้อม <strong>วันที่/เวลา/timezone</strong> และ impacted services</div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">ตรวจสอบ contact details → <strong>Create</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- M365 / O365 -->
+      <div class="card green-top">
+        <h3>&#128188; Microsoft 365 / Office 365 / Dynamics CRM</h3>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">ไปที่ <strong>Partner Center</strong> (สำหรับ CSP Partner)</div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">เลือก Customer → <strong>Service Request → New Request</strong></div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">เลือก workload ที่ได้รับผลกระทบ — portal จะ redirect ไปยัง workload portal</div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">กรอกข้อมูล — ใส่ <strong>contact ของ Partner</strong> ไม่ใช่ contact ลูกค้า</div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">Submit → ติดตาม ticket ใน M365 Admin Center <strong>→ Support Tickets</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card yellow-top" style="margin-top:.5rem">
+      <h3>&#128204; CSP Partner: ขอ Credit ผ่าน Partner Center</h3>
+      <div class="alert info" style="margin-bottom:.8rem">
+        <span class="icon">&#8505;&#65039;</span>
+        <div>Credit requests รับเฉพาะจาก <strong>CSP Direct และ Indirect Providers</strong> เท่านั้น
+        — Indirect Resellers ไม่สามารถยื่นได้โดยตรง</div>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-body">สร้าง Support Ticket ใน <strong>Partner Center</strong>
+          → เลือก topic: SLA Credit / Service Outage</div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-body">แนบหลักฐานทั้งหมดตามรายการใน Section รวบรวมหลักฐาน</div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-body">รอการอนุมัติ — Credit จะปรากฏใน <strong>invoice และ reconciliation data</strong> รอบถัดไป</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert ok">
+      <span class="icon">&#9989;</span>
+      <div>
+        <strong>Credit จะครอบคลุมเฉพาะ service ที่ได้รับผลกระทบจริง:</strong>
+        เช่น ถ้า M365 Suite เจอปัญหาแค่ SharePoint — credit จะได้เฉพาะ SharePoint
+        ไม่ใช่ทั้ง suite และ <em>credit ไม่ครอบคลุม lost revenue หรือ reputational damage</em>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== CALCULATOR ====== -->
+  <section id="calculator">
+    <h2>&#129518; SLA Calculator — คำนวณ Uptime และ Credit</h2>
+
+    <div class="calc-section">
+      <div class="calc-grid">
+
+        <!-- Service Type -->
+        <div class="field">
+          <label for="cal-service">บริการ Microsoft</label>
+          <select id="cal-service">
+            <option value="m365">Microsoft 365 / Office 365</option>
+            <option value="azure">Microsoft Azure</option>
+            <option value="dynamics">Dynamics 365</option>
+            <option value="other">บริการอื่น ๆ</option>
+          </select>
+          <span class="hint">ใช้กำหนด deadline การเคลม</span>
+        </div>
+
+        <!-- Month -->
+        <div class="field">
+          <label for="cal-month">เดือนที่เกิด Outage</label>
+          <select id="cal-month">
+            <option value="31">มกราคม (31 วัน)</option>
+            <option value="28">กุมภาพันธ์ (28 วัน)</option>
+            <option value="29">กุมภาพันธ์ — ปีอธิกสุรทิน (29 วัน)</option>
+            <option value="31">มีนาคม (31 วัน)</option>
+            <option value="30">เมษายน (30 วัน)</option>
+            <option value="31">พฤษภาคม (31 วัน)</option>
+            <option value="30">มิถุนายน (30 วัน)</option>
+            <option value="31">กรกฎาคม (31 วัน)</option>
+            <option value="31">สิงหาคม (31 วัน)</option>
+            <option value="30">กันยายน (30 วัน)</option>
+            <option value="31">ตุลาคม (31 วัน)</option>
+            <option value="30">พฤศจิกายน (30 วัน)</option>
+            <option value="31">ธันวาคม (31 วัน)</option>
+          </select>
+          <span class="hint">ใช้คำนวณ Total Billable Minutes</span>
+        </div>
+
+        <!-- Downtime -->
+        <div class="field">
+          <label>เวลา Downtime จริง (ที่ Microsoft ยืนยัน)</label>
+          <div class="downtime-row">
+            <input type="number" id="cal-dt-h" min="0" max="744" placeholder="0" value="0" />
+            <span>ชั่วโมง</span>
+            <input type="number" id="cal-dt-m" min="0" max="59" placeholder="0" value="0" />
+            <span>นาที</span>
+          </div>
+          <span class="hint">ดูจาก Post Incident Review (PIR) ใน Service Health Dashboard</span>
+        </div>
+
+        <!-- Planned Maintenance exclusion -->
+        <div class="field">
+          <label>หักเวลา Planned Maintenance (ถ้ามี)</label>
+          <div class="downtime-row">
+            <input type="number" id="cal-maint-h" min="0" max="24" placeholder="0" value="0" />
+            <span>ชั่วโมง</span>
+            <input type="number" id="cal-maint-m" min="0" max="59" placeholder="0" value="0" />
+            <span>นาที</span>
+          </div>
+          <span class="hint">ช่วงที่ Microsoft แจ้งล่วงหน้า — ไม่นับใน SLA</span>
+        </div>
+
+        <!-- Monthly cost -->
+        <div class="field field-full">
+          <label for="cal-cost">ค่าบริการรายเดือน (USD) — สำหรับคำนวณวงเงิน Credit</label>
+          <input type="number" id="cal-cost" min="0" placeholder="เช่น 1500" value="" />
+          <span class="hint">ใส่ 0 หรือเว้นว่างถ้าไม่ต้องการคำนวณวงเงิน</span>
+        </div>
+
+      </div>
+
+      <button class="btn-calc" onclick="calcSLA()">&#9654;&#65039; คำนวณ SLA</button>
+      <button class="btn-reset" onclick="resetCalc()">&#8635; รีเซ็ต</button>
+
+      <!-- RESULT -->
+      <div id="calc-result">
+
+        <div class="result-hero">
+          <div>
+            <div id="res-pct" class="result-pct ok">99.99%</div>
+            <div style="font-size:.8rem;color:var(--ms-gray);text-align:center;margin-top:.2rem">Monthly Uptime</div>
+          </div>
+          <div id="res-verdict" class="result-verdict ok">SLA ผ่าน</div>
+        </div>
+
+        <!-- Gauge -->
+        <div class="gauge-wrap">
+          <div class="gauge-track">
+            <div id="res-gauge" class="gauge-fill" style="width:100%;background:var(--ms-green)"></div>
+          </div>
+          <div class="gauge-labels">
+            <span>99%</span>
+            <span>99.9%</span>
+            <span>99.99%</span>
+            <span>100%</span>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="result-stats">
+          <div class="stat-box">
+            <div class="stat-val" id="res-total-min">—</div>
+            <div class="stat-lbl">Total Billable Minutes</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="res-down-min">—</div>
+            <div class="stat-lbl">Downtime Minutes (หลังหัก)</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="res-down-fmt">—</div>
+            <div class="stat-lbl">ระยะเวลา Downtime</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="res-allowed">—</div>
+            <div class="stat-lbl">Downtime ที่ยังอยู่ใน SLA 99.9%</div>
+          </div>
+        </div>
+
+        <!-- Credit box -->
+        <div id="res-credit-box" class="credit-box none">
+          <div id="res-credit-pct" class="credit-pct">ไม่ได้ Credit</div>
+          <div id="res-credit-amt" class="credit-amt"></div>
+          <div id="res-credit-note" class="credit-note"></div>
+        </div>
+
+        <!-- Deadline reminder -->
+        <div id="res-deadline" class="deadline-box">
+          <span>&#128197;</span>
+          <span id="res-deadline-text"></span>
+        </div>
+
+        <!-- Show formula used -->
+        <div class="calc-box" style="margin-top:1rem;font-size:.85rem" id="res-formula-box"></div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== DEADLINE ====== -->
+  <section id="deadline">
+    <h2>&#9201;&#65039; กำหนดเวลายื่นเคลม (Critical Deadlines)</h2>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>บริการ</th><th>กำหนดยื่นเคลม</th><th>นับจาก</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Microsoft Azure</strong></td>
+            <td><span class="tag tag-orange">ภายใน 2 เดือน</span></td>
+            <td>สิ้นสุด billing month ที่เกิด incident</td>
+          </tr>
+          <tr>
+            <td><strong>Microsoft 365, Dynamics 365, และบริการอื่น</strong></td>
+            <td><span class="tag tag-red">ภายใน 1 เดือน</span></td>
+            <td>สิ้นสุด billing month ที่เกิด incident</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert danger" style="margin-top:1rem">
+      <span class="icon">&#9940;</span>
+      <div>
+        <strong>ยื่นเกินกำหนด = เสียสิทธิ์ทันที</strong><br>
+        ไม่ว่า Outage จะรุนแรงแค่ไหน ถ้าพลาด deadline คุณจะไม่ได้รับ Credit เลย
+        ให้ <strong>ตั้ง calendar reminder</strong> ทันทีที่เกิด incident
+      </div>
+    </div>
+
+    <h3>Timeline การดำเนินการที่แนะนำ</h3>
+    <div class="card" style="padding:1.2rem 1.4rem">
+      <div class="timeline">
+        <div class="tl-item">
+          <strong>วันที่เกิด Outage</strong>
+          <p>จด Incident ID, เริ่มรวบรวม log และ screenshot ทันที</p>
+        </div>
+        <div class="tl-item">
+          <strong>ภายใน 24–48 ชั่วโมง</strong>
+          <p>เปิด Service Request กับ Microsoft เพื่อบันทึก incident อย่างเป็นทางการ</p>
+        </div>
+        <div class="tl-item">
+          <strong>หลัง Incident ปิด</strong>
+          <p>อ่าน Post Incident Review (PIR) เพื่อยืนยัน root cause และ affected tenants</p>
+        </div>
+        <div class="tl-item">
+          <strong>ก่อนสิ้นเดือนถัดไป (M365) / 2 เดือน (Azure)</strong>
+          <p>ยื่น SLA Credit Request พร้อมหลักฐานครบถ้วนผ่านช่องทางที่ถูกต้อง</p>
+        </div>
+        <div class="tl-item">
+          <strong>Invoice รอบถัดไป</strong>
+          <p>Credit จะปรากฏใน invoice และ reconciliation file หลังได้รับการอนุมัติ</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== ABBREV ====== -->
+  <section id="abbrev">
+    <h2>&#128204; รหัส Incident ID ของแต่ละบริการ</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>รหัส 2 ตัว</th><th>Microsoft Service</th><th>ตัวอย่าง ID</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>EX</code></td><td>Exchange Online</td><td>EX25194</td></tr>
+          <tr><td><code>FO</code></td><td>Exchange Online Protection</td><td>FO24001</td></tr>
+          <tr><td><code>SP</code></td><td>SharePoint Online</td><td>SP25033</td></tr>
+          <tr><td><code>OS</code></td><td>Office Subscription</td><td>OS24789</td></tr>
+          <tr><td><code>PB</code></td><td>Power BI for Office 365</td><td>PB24512</td></tr>
+          <tr><td><code>SB</code></td><td>Skype for Business Online</td><td>SB23100</td></tr>
+          <tr><td><code>YA</code></td><td>Yammer Enterprise</td><td>YA24200</td></tr>
+          <tr><td><code>MO</code></td><td>Microsoft 365 Portal Error</td><td>MO25050</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.82rem;color:var(--ms-gray);margin-top:.5rem">
+      * ค้นหา Incident ID ได้จาก <strong>Microsoft 365 Admin Center → Health → Service Health</strong>
+      หรือ Azure Portal → Service Health
+    </p>
+  </section>
+
+  <!-- ====== SOURCES ====== -->
+  <section id="sources">
+    <h2>&#128279; แหล่งอ้างอิงจาก Microsoft.com</h2>
+
+    <a class="source-link" href="https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services" target="_blank" rel="noopener">
+      <span class="src-icon">&#128196;</span>
+      <span>
+        <strong>SLA for Online Services — เอกสาร SLA ฉบับเต็ม (ดาวน์โหลด)</strong>
+        <span class="src-url">microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services</span>
+      </span>
+    </a>
+
+    <a class="source-link" href="https://learn.microsoft.com/en-us/partner-center/customers/report-problems-on-behalf-of-a-customer" target="_blank" rel="noopener">
+      <span class="src-icon">&#128101;</span>
+      <span>
+        <strong>Report Problems on Behalf of a Customer — Partner Center</strong>
+        <span class="src-url">learn.microsoft.com/en-us/partner-center/customers/report-problems-on-behalf-of-a-customer</span>
+      </span>
+    </a>
+
+    <a class="source-link" href="https://learn.microsoft.com/partner-center/billing/request-credit" target="_blank" rel="noopener">
+      <span class="src-icon">&#128181;</span>
+      <span>
+        <strong>How and When to Request a Credit from Microsoft</strong>
+        <span class="src-url">learn.microsoft.com/partner-center/billing/request-credit</span>
+      </span>
+    </a>
+
+    <a class="source-link" href="https://learn.microsoft.com/azure/reliability/concept-service-level-agreements" target="_blank" rel="noopener">
+      <span class="src-icon">&#128214;</span>
+      <span>
+        <strong>How to Read a Service-Level Agreement (SLA) — Azure Reliability</strong>
+        <span class="src-url">learn.microsoft.com/azure/reliability/concept-service-level-agreements</span>
+      </span>
+    </a>
+
+    <a class="source-link" href="https://learn.microsoft.com/azure/reliability/incident-response" target="_blank" rel="noopener">
+      <span class="src-icon">&#9729;&#65039;</span>
+      <span>
+        <strong>What to Do During an Azure Service Disruption</strong>
+        <span class="src-url">learn.microsoft.com/azure/reliability/incident-response</span>
+      </span>
+    </a>
+
+    <a class="source-link" href="https://admin.microsoft.com" target="_blank" rel="noopener">
+      <span class="src-icon">&#128187;</span>
+      <span>
+        <strong>Microsoft 365 Admin Center — ตรวจสอบ Service Health</strong>
+        <span class="src-url">admin.microsoft.com → Health → Service Health</span>
+      </span>
+    </a>
+
+    <a class="source-link" href="https://portal.azure.com" target="_blank" rel="noopener">
+      <span class="src-icon">&#9729;&#65039;</span>
+      <span>
+        <strong>Azure Portal — Service Health & Support Requests</strong>
+        <span class="src-url">portal.azure.com → Help + Support</span>
+      </span>
+    </a>
+
+    <div class="alert info" style="margin-top:1rem">
+      <span class="icon">&#8505;&#65039;</span>
+      <div>
+        ข้อมูลทั้งหมดในหน้านี้อ้างอิงจาก <strong>Microsoft.com และ Learn.Microsoft.com เท่านั้น</strong>
+        ดาวน์โหลดเอกสาร SLA ฉบับล่าสุดได้ที่ microsoft.com/licensing เพื่อตรวจสอบอัตรา Credit และเงื่อนไขที่เป็นปัจจุบัน
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  ข้อมูลอ้างอิงจาก
+  <a href="https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services" target="_blank">Microsoft Licensing SLA</a>,
+  <a href="https://learn.microsoft.com/en-us/partner-center/customers/report-problems-on-behalf-of-a-customer" target="_blank">Partner Center Docs</a>
+  และ <a href="https://learn.microsoft.com/azure/reliability/concept-service-level-agreements" target="_blank">Azure Reliability Docs</a>
+  &nbsp;|&nbsp; ใช้ข้อมูลจาก Microsoft.com เท่านั้น
+</footer>
+
+<script>
+  /* ===== ACTIVE NAV ON SCROLL ===== */
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav.tabs a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const link = document.querySelector(`nav.tabs a[href="#${e.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { threshold: 0.35 });
+  sections.forEach(s => observer.observe(s));
+
+  navLinks.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  /* ===== SLA CALCULATOR ===== */
+  function getVal(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+  function fmtMin(m) {
+    if (m < 60) return `${m} นาที`;
+    const h = Math.floor(m / 60), rem = m % 60;
+    return rem ? `${h} ชม. ${rem} นาที` : `${h} ชั่วโมง`;
+  }
+
+  function calcSLA() {
+    const days      = parseInt(document.getElementById('cal-month').value);
+    const service   = document.getElementById('cal-service').value;
+    const dtH       = getVal('cal-dt-h');
+    const dtM       = getVal('cal-dt-m');
+    const maintH    = getVal('cal-maint-h');
+    const maintM    = getVal('cal-maint-m');
+    const monthlyCost = getVal('cal-cost');
+
+    const totalMin  = days * 24 * 60;
+    const rawDownMin = Math.round(dtH * 60 + dtM);
+    const maintMin   = Math.round(maintH * 60 + maintM);
+    const netDownMin = Math.max(0, rawDownMin - maintMin);
+
+    if (netDownMin > totalMin) {
+      alert('Downtime มากกว่า Total Billable Minutes — กรุณาตรวจสอบข้อมูล');
+      return;
+    }
+
+    const uptime = ((totalMin - netDownMin) / totalMin) * 100;
+    const uptimeFmt = uptime.toFixed(4);
+
+    // Credit tier
+    let creditPct = 0, tier = 'none', verdictText = '', verdictClass = 'ok';
+    if (uptime >= 99.9) {
+      creditPct = 0; tier = 'none';
+      verdictText = '&#9989; SLA ผ่าน — Uptime เป็นไปตาม Commitment';
+      verdictClass = 'ok';
+    } else if (uptime >= 99.0) {
+      creditPct = 10; tier = 'tier1';
+      verdictText = '&#9888;&#65039; SLA ละเมิด — ต่ำกว่า 99.9%';
+      verdictClass = 'warn';
+    } else {
+      creditPct = 25; tier = 'tier2';
+      verdictText = '&#10060; SLA ละเมิดร้ายแรง — ต่ำกว่า 99%';
+      verdictClass = 'fail';
+    }
+
+    // Allowed downtime for 99.9%
+    const allowedMin = Math.floor(totalMin * 0.001);
+
+    // Credit amount
+    const creditAmt = monthlyCost > 0 ? (monthlyCost * creditPct / 100) : null;
+
+    // Deadline
+    const deadlineText = (service === 'azure')
+      ? '&#9203; กำหนดยื่นเคลม: <strong>ภายใน 2 เดือน</strong>หลังสิ้นสุด billing month ที่เกิด incident (Azure)'
+      : '&#9203; กำหนดยื่นเคลม: <strong>ภายใน 1 เดือน</strong>หลังสิ้นสุด billing month ที่เกิด incident';
+
+    // Gauge — map uptime 99% → 100% to 0% → 100% width
+    const gaugeMin = 99.0, gaugeMax = 100.0;
+    const gaugePct = Math.min(100, Math.max(0, ((uptime - gaugeMin) / (gaugeMax - gaugeMin)) * 100));
+    const gaugeColor = tier === 'none' ? 'var(--ms-green)' : tier === 'tier1' ? '#ca5010' : 'var(--ms-red)';
+
+    // Formula string
+    const formulaHTML =
+      `<span class="comment"># การคำนวณของคุณ</span><br>` +
+      `Total Billable Minutes = ${days} วัน × 24 × 60 = <span class="result">${totalMin.toLocaleString()} นาที</span><br>` +
+      `Raw Downtime = ${rawDownMin} นาที | Planned Maintenance = ${maintMin} นาที<br>` +
+      `<span class="formula">Net Downtime</span> = ${rawDownMin} − ${maintMin} = <span class="result">${netDownMin} นาที</span><br>` +
+      `<span class="formula">Monthly Uptime %</span> = (${totalMin.toLocaleString()} − ${netDownMin}) ÷ ${totalMin.toLocaleString()} × 100 = <span class="result">${uptimeFmt}%</span>`;
+
+    // Credit note
+    let creditNote = '';
+    if (tier === 'none') {
+      creditNote = 'Uptime ≥ 99.9% — ไม่มีสิทธิ์ขอ SLA Credit';
+    } else if (creditAmt !== null && creditAmt > 0) {
+      creditNote = `ประมาณการ Credit ≈ $${creditAmt.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})} USD (${creditPct}% ของค่าบริการ $${monthlyCost.toLocaleString()})`;
+    } else if (creditPct > 0) {
+      creditNote = `Credit ${creditPct}% ของค่าบริการรายเดือน — ใส่ค่าบริการเพื่อดูวงเงิน`;
+    }
+
+    /* ---- Update DOM ---- */
+    const pctEl = document.getElementById('res-pct');
+    pctEl.textContent = uptimeFmt + '%';
+    pctEl.className = 'result-pct ' + verdictClass;
+
+    const verdEl = document.getElementById('res-verdict');
+    verdEl.innerHTML = verdictText;
+    verdEl.className = 'result-verdict ' + verdictClass;
+
+    document.getElementById('res-gauge').style.width = gaugePct + '%';
+    document.getElementById('res-gauge').style.background = gaugeColor;
+
+    document.getElementById('res-total-min').textContent = totalMin.toLocaleString();
+    document.getElementById('res-down-min').textContent  = netDownMin.toLocaleString();
+    document.getElementById('res-down-fmt').textContent  = fmtMin(netDownMin);
+    document.getElementById('res-allowed').textContent   = fmtMin(allowedMin);
+
+    const cb = document.getElementById('res-credit-box');
+    cb.className = 'credit-box ' + tier;
+    document.getElementById('res-credit-pct').textContent = tier === 'none' ? 'ไม่ได้ Credit' : creditPct + '%';
+    document.getElementById('res-credit-amt').textContent = '';
+    document.getElementById('res-credit-note').textContent = creditNote;
+    if (creditAmt !== null && creditAmt > 0) {
+      document.getElementById('res-credit-amt').textContent =
+        `≈ $${creditAmt.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})} USD`;
+    }
+
+    document.getElementById('res-deadline').innerHTML = '<span>&#128197;</span><span>' + deadlineText + '</span>';
+    document.getElementById('res-formula-box').innerHTML = formulaHTML;
+
+    const resultEl = document.getElementById('calc-result');
+    resultEl.style.display = 'block';
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function resetCalc() {
+    ['cal-dt-h','cal-dt-m','cal-maint-h','cal-maint-m'].forEach(id => document.getElementById(id).value = 0);
+    document.getElementById('cal-cost').value = '';
+    document.getElementById('calc-result').style.display = 'none';
+  }
+</script>
+</body>
+</html>
