@@ -584,13 +584,6 @@
             <td><strong>5 นาทีขึ้นไป</strong></td>
             <td>10% ของ Applicable Service Fees</td>
           </tr>
-          <tr>
-            <td><strong>Azure — โปรไฟล์ 99.999%</strong><br><small>เฉพาะ resource / architecture ที่ SLA ระบุ</small></td>
-            <td>99.999%</td>
-            <td>26.784 วินาที</td>
-            <td><strong>มากกว่า 26.784 วินาที</strong></td>
-            <td>5% ของ Applicable Service Fees</td>
-          </tr>
         </tbody>
       </table>
     </div>
@@ -598,7 +591,7 @@
     <div class="alert warn">
       <span class="icon">&#9888;&#65039;</span>
       <div>
-        <strong>เลือก service ให้ตรงก่อนเคลม:</strong> Azure ไม่มี SLA กลางค่าเดียวสำหรับทุกบริการ; ค่า 99.9%, 99.95%, 99.99% และ 99.999% ขึ้นกับ service, tier, region และรูปแบบ deployment.
+        <strong>เลือก service ให้ตรงก่อนเคลม:</strong> Azure ไม่มี SLA กลางค่าเดียวสำหรับทุกบริการ; ค่า 99.9%, 99.95% และ 99.99% ในตารางเป็นตัวอย่าง profile ที่พบในเอกสาร และขึ้นกับ service, tier, region และรูปแบบ deployment.
         บางบริการยังวัดเป็น request/error rate แทนเวลา ส่วน M365 บาง workload ก็มีนิยามเฉพาะ จึงต้องยืนยันกับรายการ SLA ของบริการนั้นเสมอ
       </div>
     </div>
@@ -613,7 +606,6 @@
             <option value="azure999">Azure — 99.9%</option>
             <option value="azure9995">Azure — 99.95%</option>
             <option value="azure9999">Azure — 99.99%</option>
-            <option value="azure99999">Azure — 99.999%</option>
           </select>
         </div>
         <div class="field">
@@ -1268,8 +1260,7 @@
       m365: { label: 'Microsoft 365 / Dynamics 365 / Intune', commitment: 99.9, firstCredit: 25 },
       azure999: { label: 'Azure 99.9% profile', commitment: 99.9, firstCredit: 10 },
       azure9995: { label: 'Azure 99.95% profile', commitment: 99.95, firstCredit: 10 },
-      azure9999: { label: 'Azure 99.99% profile', commitment: 99.99, firstCredit: 10 },
-      azure99999: { label: 'Azure 99.999% profile', commitment: 99.999, firstCredit: 5 }
+      azure9999: { label: 'Azure 99.99% profile', commitment: 99.99, firstCredit: 10 }
     };
     const profile = profiles[document.getElementById('oct-profile').value];
     const downtime = parseFloat(document.getElementById('oct-downtime').value);
