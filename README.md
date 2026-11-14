@@ -10,6 +10,7 @@
 - แสดงหลักการคำนวณ Monthly Uptime Percentage
 - คำนวณ Downtime หลังหัก Planned Maintenance
 - แสดงผล Uptime, SLA threshold, ระดับเครดิตโดยประมาณ และจำนวนเครดิตจากค่าบริการรายเดือน
+- สร้างร่างภาษาอังกฤษสำหรับเปิด Support Ticket / ขอ SLA Service Credit พร้อมรายการรายละเอียดที่ควรระบุและปุ่มคัดลอก
 - สรุปช่วงเวลาสำหรับยื่นคำขอ: Azure ภายใน 2 เดือน และบริการอื่นภายใน 1 เดือน นับจากสิ้นสุด billing month ที่เกิดเหตุการณ์
 - รวมลิงก์เอกสารอ้างอิงจาก Microsoft และ Microsoft Learn
 
@@ -94,6 +95,20 @@
 ### ตัวอย่างย่อ
 
 หากบริการมี outage 2 ชั่วโมง 15 นาทีในเดือน 30 วัน และมี Planned Maintenance ที่หักได้ 30 นาที ให้เลือก 30 วัน กรอก Downtime เป็น `2` ชั่วโมง `15` นาที กรอก Planned Maintenance เป็น `0` ชั่วโมง `30` นาที แล้วกด **คำนวณ SLA** ระบบจะใช้ Net Downtime เท่ากับ 1 ชั่วโมง 45 นาทีในการคำนวณ Uptime
+
+## สร้างข้อความสำหรับเปิด Ticket / ขอ SLA Credit
+
+หลังคำนวณ SLA แล้ว ให้เปิดหัวข้อ **สร้าง Ticket** จากแถบเมนู และทำตามขั้นตอนนี้
+
+1. กรอกชื่อองค์กร, Tenant ID หรือ tenant domain และ Subscription ID / Billing account (ถ้ามี)
+2. กรอก Microsoft Incident ID, ชื่อบริการหรือ resource ที่ได้รับผลกระทบ และ region หรือ location
+3. ระบุเวลาเริ่มและสิ้นสุดเหตุพร้อม timezone รวมถึงจำนวนผู้ใช้หรือ workloads ที่ได้รับผลกระทบ
+4. อธิบายอาการที่พบและผลกระทบทางธุรกิจที่ตรวจสอบได้ เช่น error message, timeout หรือการทำงานที่หยุดชะงัก
+5. ระบุหลักฐานที่แนบและการตรวจสอบที่ทำแล้ว เช่น Service Health screenshot, error logs, request IDs, retry logs, Post Incident Review และ Support Case เดิม
+6. กรอกชื่อกับอีเมลธุรกิจของผู้ติดต่อ แล้วกด **สร้างข้อความสำหรับ Ticket**
+7. ตรวจทานร่างภาษาอังกฤษ โดยแทนที่ข้อความในวงเล็บเหลี่ยมที่ยังไม่มีข้อมูล และกด **คัดลอกข้อความ** เพื่อนำไปวางใน Microsoft Support Portal
+
+ร่างข้อความจะดึงรายละเอียดการคำนวณที่ทำไว้ ได้แก่ billing month, downtime, planned maintenance, net downtime, monthly uptime และเครดิตโดยประมาณมาใส่ให้อัตโนมัติ ทั้งนี้ต้องตรวจสอบความถูกต้องและเงื่อนไข SLA ฉบับล่าสุดก่อนส่งเสมอ
 
 ## สูตรคำนวณ
 

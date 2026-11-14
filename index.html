@@ -269,7 +269,9 @@
 
     .field select,
     .field input[type="number"],
-    .field input[type="text"] {
+    .field input[type="text"],
+    .field input[type="datetime-local"],
+    .field textarea {
       border: 1.5px solid #c8c6c4;
       border-radius: 6px;
       padding: .55rem .75rem;
@@ -279,7 +281,9 @@
       background: #faf9f8;
     }
     .field select:focus,
-    .field input:focus { outline: none; border-color: var(--ms-blue); background: var(--white); }
+    .field input:focus,
+    .field textarea:focus { outline: none; border-color: var(--ms-blue); background: var(--white); }
+    .field textarea { min-height: 86px; resize: vertical; }
 
     .field-full { grid-column: 1 / -1; }
 
@@ -320,6 +324,22 @@
       transition: all .2s;
     }
     .btn-reset:hover { border-color: var(--ms-blue); color: var(--ms-blue); }
+
+    .template-output {
+      width: 100%;
+      min-height: 420px;
+      margin-top: 1rem;
+      border: 1.5px solid #c8c6c4;
+      border-radius: 6px;
+      padding: .8rem;
+      font: .88rem/1.55 "Cascadia Code", "Consolas", monospace;
+      background: #faf9f8;
+      color: #323130;
+      resize: vertical;
+    }
+    .template-actions { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: .8rem; }
+    .btn-copy { width: auto; padding: .65rem 1.1rem; margin: 0; }
+    .copy-status { align-self: center; font-size: .85rem; color: var(--ms-green); }
 
     /* Result panel */
     #calc-result {
@@ -448,6 +468,7 @@
   <a href="#claim">ขอเคลม</a>
   <a href="#deadline">กำหนดเวลา</a>
   <a href="#calculator">&#129518; คำนวณ SLA</a>
+  <a href="#ticket-template">&#128221; สร้าง Ticket</a>
   <a href="#abbrev">รหัส Incident</a>
   <a href="#sources">แหล่งอ้างอิง</a>
 </nav>
@@ -861,6 +882,91 @@
     </div>
   </section>
 
+  <!-- ====== TICKET TEMPLATE ====== -->
+  <section id="ticket-template">
+    <h2>&#128221; SLA Credit Request Template Generator</h2>
+
+    <div class="alert info">
+      <span class="icon">&#8505;&#65039;</span>
+      <div>
+        กรอกข้อมูลเหตุการณ์ด้านล่าง แล้วกด <strong>สร้างข้อความสำหรับ Ticket</strong> เพื่อสร้างร่างภาษาอังกฤษสำหรับส่งให้ Microsoft
+        โดยควรกดคำนวณ SLA ก่อน เพื่อให้ข้อมูล Uptime และเครดิตโดยประมาณถูกนำไปใส่ในร่างอัตโนมัติ
+      </div>
+    </div>
+
+    <div class="calc-section">
+      <div class="calc-grid">
+        <div class="field">
+          <label for="ticket-company">ชื่อบริษัท / องค์กร</label>
+          <input type="text" id="ticket-company" placeholder="เช่น Contoso (Thailand) Co., Ltd." />
+        </div>
+        <div class="field">
+          <label for="ticket-tenant">Tenant ID หรือ Tenant domain</label>
+          <input type="text" id="ticket-tenant" placeholder="เช่น contoso.onmicrosoft.com หรือ Tenant GUID" />
+        </div>
+        <div class="field">
+          <label for="ticket-incident">Microsoft Incident ID</label>
+          <input type="text" id="ticket-incident" placeholder="เช่น EX25194 หรือ Azure incident tracking ID" />
+          <span class="hint">หาได้จาก Service Health Dashboard หรือ Post Incident Review</span>
+        </div>
+        <div class="field">
+          <label for="ticket-subscription">Subscription ID / Billing account</label>
+          <input type="text" id="ticket-subscription" placeholder="สำหรับ Azure หรือข้อมูล billing ที่เกี่ยวข้อง" />
+        </div>
+        <div class="field">
+          <label for="ticket-resource">บริการ / Resource ที่ได้รับผลกระทบ</label>
+          <input type="text" id="ticket-resource" placeholder="เช่น Exchange Online, Azure App Service ชื่อ..." />
+        </div>
+        <div class="field">
+          <label for="ticket-region">Region / Location ที่ได้รับผลกระทบ</label>
+          <input type="text" id="ticket-region" placeholder="เช่น Southeast Asia หรือ All users in Thailand" />
+        </div>
+        <div class="field">
+          <label for="ticket-start">เวลาเริ่มเกิดเหตุ</label>
+          <input type="datetime-local" id="ticket-start" />
+        </div>
+        <div class="field">
+          <label for="ticket-end">เวลาสิ้นสุดเหตุ</label>
+          <input type="datetime-local" id="ticket-end" />
+        </div>
+        <div class="field">
+          <label for="ticket-timezone">Timezone ของเวลาเหตุการณ์</label>
+          <input type="text" id="ticket-timezone" value="ICT (UTC+07:00)" />
+        </div>
+        <div class="field">
+          <label for="ticket-users">ขอบเขตผลกระทบ</label>
+          <input type="text" id="ticket-users" placeholder="เช่น ผู้ใช้ 150 คนจาก 200 คน / 3 production workloads" />
+        </div>
+        <div class="field field-full">
+          <label for="ticket-impact">อาการและผลกระทบทางธุรกิจ</label>
+          <textarea id="ticket-impact" placeholder="เช่น Users were unable to send or receive email. The issue blocked order processing and customer support operations."></textarea>
+          <span class="hint">ระบุ error message, timeout หรือพฤติกรรมที่พบ และผลกระทบที่ตรวจสอบได้</span>
+        </div>
+        <div class="field field-full">
+          <label for="ticket-evidence">หลักฐานและการดำเนินการที่ทำแล้ว</label>
+          <textarea id="ticket-evidence" placeholder="เช่น Attached: Service Health screenshot, error logs, request IDs, retry logs, and the Post Incident Review. We retried the requests and confirmed the issue was not caused by our configuration."></textarea>
+          <span class="hint">ระบุไฟล์แนบ, request ID, retry attempts, troubleshooting และ Support Ticket เดิม (ถ้ามี)</span>
+        </div>
+        <div class="field">
+          <label for="ticket-contact">ชื่อและอีเมลผู้ติดต่อ</label>
+          <input type="text" id="ticket-contact" placeholder="เช่น Somchai Jaidee, somchai@contoso.com" />
+        </div>
+        <div class="field">
+          <label for="ticket-existing">Support Request / Case Number (ถ้ามี)</label>
+          <input type="text" id="ticket-existing" placeholder="เช่น 2501010040001234" />
+        </div>
+      </div>
+
+      <button class="btn-calc" onclick="generateTicketTemplate()">&#128221; สร้างข้อความสำหรับ Ticket</button>
+
+      <textarea id="ticket-output" class="template-output" aria-label="ข้อความ Ticket ที่สร้างขึ้น" placeholder="ข้อความ Ticket ที่สร้างขึ้นจะแสดงที่นี่"></textarea>
+      <div class="template-actions">
+        <button class="btn-calc btn-copy" type="button" onclick="copyTicketTemplate()">&#128203; คัดลอกข้อความ</button>
+        <span id="copy-status" class="copy-status" role="status" aria-live="polite"></span>
+      </div>
+    </div>
+  </section>
+
   <!-- ====== DEADLINE ====== -->
   <section id="deadline">
     <h2>&#9201;&#65039; กำหนดเวลายื่นเคลม (Critical Deadlines)</h2>
@@ -1055,6 +1161,8 @@
   });
 
   /* ===== SLA CALCULATOR ===== */
+  let lastCalculation = null;
+
   function getVal(id) { return parseFloat(document.getElementById(id).value) || 0; }
 
   function fmtMin(m) {
@@ -1165,15 +1273,132 @@
     document.getElementById('res-deadline').innerHTML = '<span>&#128197;</span><span>' + deadlineText + '</span>';
     document.getElementById('res-formula-box').innerHTML = formulaHTML;
 
+    lastCalculation = {
+      serviceLabel: document.getElementById('cal-service').selectedOptions[0].text,
+      days: days,
+      rawDownMin: rawDownMin,
+      maintMin: maintMin,
+      netDownMin: netDownMin,
+      uptimeFmt: uptimeFmt,
+      creditPct: creditPct,
+      creditAmt: creditAmt,
+      monthlyCost: monthlyCost,
+      deadline: service === 'azure' ? 'within 2 months after the end of the affected billing month' : 'within 1 month after the end of the affected billing month'
+    };
+
     const resultEl = document.getElementById('calc-result');
     resultEl.style.display = 'block';
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  /* ===== TICKET TEMPLATE GENERATOR ===== */
+  function ticketVal(id, fallback) {
+    const value = document.getElementById(id).value.trim();
+    return value || fallback;
+  }
+
+  function generateTicketTemplate() {
+    if (!lastCalculation) {
+      alert('กรุณากด “คำนวณ SLA” ก่อนสร้างข้อความสำหรับ Ticket');
+      document.getElementById('calculator').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    const company = ticketVal('ticket-company', '[Company name]');
+    const tenant = ticketVal('ticket-tenant', '[Tenant ID or tenant domain]');
+    const incident = ticketVal('ticket-incident', '[Microsoft Incident ID]');
+    const subscription = ticketVal('ticket-subscription', '[Subscription ID / Billing account]');
+    const resource = ticketVal('ticket-resource', '[Affected service or resource]');
+    const region = ticketVal('ticket-region', '[Affected region or user location]');
+    const start = ticketVal('ticket-start', '[Start date and time]');
+    const end = ticketVal('ticket-end', '[End date and time]');
+    const timezone = ticketVal('ticket-timezone', 'UTC');
+    const users = ticketVal('ticket-users', '[Number of affected users or workloads]');
+    const impact = ticketVal('ticket-impact', '[Describe the observed symptoms and measurable business impact.]');
+    const evidence = ticketVal('ticket-evidence', '[List attached logs, screenshots, request IDs, retry evidence, and troubleshooting performed.]');
+    const contact = ticketVal('ticket-contact', '[Name and business email address]');
+    const existingCase = ticketVal('ticket-existing', 'N/A');
+    const creditEstimate = lastCalculation.creditPct > 0
+      ? lastCalculation.creditPct + '%'
+      : 'Not requested; preliminary calculation indicates the SLA target was met';
+    const creditAmount = lastCalculation.creditAmt !== null && lastCalculation.creditAmt > 0
+      ? ' Estimated value: USD ' + lastCalculation.creditAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '.'
+      : '';
+
+    const template = [
+      'Subject: SLA Service Credit Request — ' + incident + ' — ' + resource,
+      '',
+      'Hello Microsoft Support Team,',
+      '',
+      'I am submitting an SLA Service Credit request for the service disruption described below.',
+      '',
+      'Customer and service details',
+      '- Organization: ' + company,
+      '- Tenant ID / domain: ' + tenant,
+      '- Subscription ID / billing account: ' + subscription,
+      '- Affected Microsoft service / resource: ' + resource,
+      '- Affected region / location: ' + region,
+      '- Microsoft Incident ID: ' + incident,
+      '- Existing Support Request / Case Number: ' + existingCase,
+      '',
+      'Incident timeline and impact',
+      '- Start time: ' + start + ' (' + timezone + ')',
+      '- End time: ' + end + ' (' + timezone + ')',
+      '- Affected users / workloads: ' + users,
+      '- Observed impact: ' + impact,
+      '',
+      'SLA calculation (preliminary)',
+      '- Billing month length: ' + lastCalculation.days + ' days',
+      '- Confirmed downtime: ' + fmtMin(lastCalculation.rawDownMin),
+      '- Planned maintenance excluded: ' + fmtMin(lastCalculation.maintMin),
+      '- Net downtime: ' + fmtMin(lastCalculation.netDownMin),
+      '- Calculated monthly uptime: ' + lastCalculation.uptimeFmt + '%',
+      '- Requested service credit: ' + creditEstimate + '.' + creditAmount,
+      '',
+      'Evidence and troubleshooting',
+      '- ' + evidence,
+      '',
+      'Request',
+      'Please review this incident against the applicable SLA and confirm whether our tenant is eligible for a Service Credit. If additional information is required, please let us know.',
+      '',
+      'We understand that this is a request for review and that the final eligibility, downtime measurement, and credit amount are subject to the applicable Microsoft SLA and agreement terms.',
+      '',
+      'Please respond to: ' + contact,
+      '',
+      'Thank you,',
+      company,
+      '',
+      'Submission reminder: Submit this request ' + lastCalculation.deadline + '.'
+    ].join('\n');
+
+    document.getElementById('ticket-output').value = template;
+    document.getElementById('copy-status').textContent = 'ตรวจสอบข้อความและแทนที่ข้อมูลใน [วงเล็บ] ก่อนส่ง';
+  }
+
+  async function copyTicketTemplate() {
+    const output = document.getElementById('ticket-output');
+    const status = document.getElementById('copy-status');
+    if (!output.value.trim()) {
+      status.textContent = 'กรุณาสร้างข้อความสำหรับ Ticket ก่อน';
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(output.value);
+      status.textContent = 'คัดลอกข้อความแล้ว';
+    } catch (error) {
+      output.focus();
+      output.select();
+      document.execCommand('copy');
+      status.textContent = 'เลือกข้อความแล้ว — สามารถกด Ctrl+C เพื่อคัดลอก';
+    }
   }
 
   function resetCalc() {
     ['cal-dt-h','cal-dt-m','cal-maint-h','cal-maint-m'].forEach(id => document.getElementById(id).value = 0);
     document.getElementById('cal-cost').value = '';
     document.getElementById('calc-result').style.display = 'none';
+    lastCalculation = null;
   }
 </script>
 </body>
