@@ -462,6 +462,7 @@
 <!-- TAB NAV -->
 <nav class="tabs">
   <a href="#overview" class="active">ภาพรวม SLA</a>
+  <a href="#october-sla">&#128197; SLA ตุลาคม</a>
   <a href="#detect">ตรวจจับ Outage</a>
   <a href="#evaluate">ประเมิน SLA</a>
   <a href="#evidence">รวบรวมหลักฐาน</a>
@@ -507,22 +508,123 @@
       </div>
     </div>
 
-    <h3>ตาราง Credit ที่ได้รับ (ตัวอย่าง Standard Tier)</h3>
+    <h3>ตาราง Service Credit ตามโปรไฟล์ SLA ที่พบบ่อย</h3>
     <div class="tbl-wrap">
       <table>
         <thead>
-          <tr><th>Monthly Uptime Percentage</th><th>Service Credit ที่ได้รับ</th></tr>
+          <tr><th>โปรไฟล์</th><th>Monthly Uptime Percentage</th><th>Service Credit</th></tr>
         </thead>
         <tbody>
-          <tr><td>≥ 99.9%</td><td><span class="tag tag-green">ไม่ได้ Credit</span> — เป็นไปตาม SLA</td></tr>
-          <tr><td>&lt; 99.9%</td><td><span class="tag tag-orange">10%</span> ของค่าบริการรายเดือน</td></tr>
-          <tr><td>&lt; 99%</td><td><span class="tag tag-red">25%</span> ของค่าบริการรายเดือน</td></tr>
+          <tr><td>Microsoft 365 / Dynamics 365 / Intune (มาตรฐาน)</td><td>&lt; 99.9% / &lt; 99% / &lt; 95%</td><td><span class="tag tag-orange">25% / 50% / 100%</span></td></tr>
+          <tr><td>Azure 99.9% profile (ตัวอย่าง service หลายรายการ)</td><td>&lt; 99.9% / &lt; 99%</td><td><span class="tag tag-orange">10% / 25%</span></td></tr>
+          <tr><td>Azure 99.95% หรือ 99.99% profile</td><td>ต่ำกว่า SLA ของ service นั้น / &lt; 99%</td><td><span class="tag tag-orange">10% / 25%</span></td></tr>
         </tbody>
       </table>
     </div>
     <p style="font-size:.82rem;color:var(--ms-gray);margin-top:.4rem">
-      * อัตรา Credit จริงขึ้นอยู่กับ service tier — ดูเอกสาร SLA ฉบับล่าสุดจาก microsoft.com/licensing
+      * Azure แตกต่างตาม service, tier และ architecture; เปิดหัวข้อ <strong>SLA ตุลาคม</strong> เพื่อดูเกณฑ์ downtime ของเดือน 31 วัน และตรวจ SLA รายบริการก่อนยื่นเคลม
     </p>
+  </section>
+
+  <!-- ====== OCTOBER SLA THRESHOLDS ====== -->
+  <section id="october-sla">
+    <h2>&#128197; เกณฑ์ SLA เดือนตุลาคม — 31 วัน</h2>
+    <div class="alert info">
+      <span class="icon">&#8505;&#65039;</span>
+      <div>
+        เดือนตุลาคมมี <strong>44,640 นาที</strong> ตารางนี้แสดงเวลาหยุดให้บริการสูงสุดก่อน Uptime จะต่ำกว่า SLA ที่คอมมิต
+        และเวลาที่เกินแล้วจึงเริ่มเข้าเกณฑ์ขอ Service Credit ได้ โดยอ้างอิง <strong>Microsoft Online Services SLA (WW), October 2026</strong>
+      </div>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>กลุ่มผลิตภัณฑ์ / โปรไฟล์ SLA</th>
+            <th>SLA ที่คอมมิต</th>
+            <th>Downtime สูงสุดก่อนต่ำกว่า SLA</th>
+            <th>เริ่มเข้าเกณฑ์เคลมเมื่อ Downtime</th>
+            <th>Service Credit ขั้นแรก</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Microsoft 365 / Office 365</strong><br><small>บริการที่วัด Uptime ตามมาตรฐาน</small></td>
+            <td>99.9%</td>
+            <td>44 นาที 38.4 วินาที</td>
+            <td><strong>45 นาทีขึ้นไป</strong></td>
+            <td>25% ของ Applicable Service Fees</td>
+          </tr>
+          <tr>
+            <td><strong>Dynamics 365 และ Microsoft Intune</strong><br><small>โปรไฟล์มาตรฐานที่ใช้ Uptime</small></td>
+            <td>99.9%</td>
+            <td>44 นาที 38.4 วินาที</td>
+            <td><strong>45 นาทีขึ้นไป</strong></td>
+            <td>25% ของ Applicable Service Fees</td>
+          </tr>
+          <tr>
+            <td><strong>Azure — โปรไฟล์ 99.9%</strong><br><small>พบใน Azure services หลายรายการ</small></td>
+            <td>99.9%</td>
+            <td>44 นาที 38.4 วินาที</td>
+            <td><strong>45 นาทีขึ้นไป</strong></td>
+            <td>10% ของ Applicable Service Fees</td>
+          </tr>
+          <tr>
+            <td><strong>Azure — โปรไฟล์ 99.95%</strong><br><small>เช่นบาง tier / single-region deployment</small></td>
+            <td>99.95%</td>
+            <td>22 นาที 19.2 วินาที</td>
+            <td><strong>23 นาทีขึ้นไป</strong></td>
+            <td>10% ของ Applicable Service Fees</td>
+          </tr>
+          <tr>
+            <td><strong>Azure — โปรไฟล์ 99.99%</strong><br><small>เช่นบาง multi-zone หรือ multi-region deployment</small></td>
+            <td>99.99%</td>
+            <td>4 นาที 27.84 วินาที</td>
+            <td><strong>5 นาทีขึ้นไป</strong></td>
+            <td>10% ของ Applicable Service Fees</td>
+          </tr>
+          <tr>
+            <td><strong>Azure — โปรไฟล์ 99.999%</strong><br><small>เฉพาะ resource / architecture ที่ SLA ระบุ</small></td>
+            <td>99.999%</td>
+            <td>26.784 วินาที</td>
+            <td><strong>มากกว่า 26.784 วินาที</strong></td>
+            <td>5% ของ Applicable Service Fees</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert warn">
+      <span class="icon">&#9888;&#65039;</span>
+      <div>
+        <strong>เลือก service ให้ตรงก่อนเคลม:</strong> Azure ไม่มี SLA กลางค่าเดียวสำหรับทุกบริการ; ค่า 99.9%, 99.95%, 99.99% และ 99.999% ขึ้นกับ service, tier, region และรูปแบบ deployment.
+        บางบริการยังวัดเป็น request/error rate แทนเวลา ส่วน M365 บาง workload ก็มีนิยามเฉพาะ จึงต้องยืนยันกับรายการ SLA ของบริการนั้นเสมอ
+      </div>
+    </div>
+
+    <div class="calc-section" style="margin-top:1rem">
+      <h3>เช็กสิทธิ์เบื้องต้นสำหรับเดือนตุลาคม</h3>
+      <div class="calc-grid">
+        <div class="field">
+          <label for="oct-profile">เลือกโปรไฟล์ SLA</label>
+          <select id="oct-profile">
+            <option value="m365">Microsoft 365 / Dynamics 365 / Intune — 99.9%</option>
+            <option value="azure999">Azure — 99.9%</option>
+            <option value="azure9995">Azure — 99.95%</option>
+            <option value="azure9999">Azure — 99.99%</option>
+            <option value="azure99999">Azure — 99.999%</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="oct-downtime">Downtime ที่ยืนยันแล้ว (นาที)</label>
+          <input type="number" id="oct-downtime" min="0" max="44640" step="0.001" placeholder="เช่น 45" />
+          <span class="hint">หัก Scheduled / Planned Maintenance ที่เข้าเงื่อนไขแล้ว</span>
+        </div>
+      </div>
+      <button class="btn-calc" type="button" onclick="checkOctoberSLA()">&#128269; ตรวจเกณฑ์ SLA เดือนตุลาคม</button>
+      <div id="oct-result" class="alert info" style="display:none;margin-top:1rem"></div>
+    </div>
   </section>
 
   <!-- ====== DETECT ====== -->
@@ -1160,6 +1262,46 @@
     });
   });
 
+  /* ===== OCTOBER SLA THRESHOLD CHECKER ===== */
+  function checkOctoberSLA() {
+    const profiles = {
+      m365: { label: 'Microsoft 365 / Dynamics 365 / Intune', commitment: 99.9, firstCredit: 25 },
+      azure999: { label: 'Azure 99.9% profile', commitment: 99.9, firstCredit: 10 },
+      azure9995: { label: 'Azure 99.95% profile', commitment: 99.95, firstCredit: 10 },
+      azure9999: { label: 'Azure 99.99% profile', commitment: 99.99, firstCredit: 10 },
+      azure99999: { label: 'Azure 99.999% profile', commitment: 99.999, firstCredit: 5 }
+    };
+    const profile = profiles[document.getElementById('oct-profile').value];
+    const downtime = parseFloat(document.getElementById('oct-downtime').value);
+    const result = document.getElementById('oct-result');
+
+    if (!Number.isFinite(downtime) || downtime < 0 || downtime > 44640) {
+      result.className = 'alert danger';
+      result.style.display = 'flex';
+      result.innerHTML = '<span class="icon">&#9888;&#65039;</span><div>กรุณากรอก Downtime ตั้งแต่ 0 ถึง 44,640 นาที</div>';
+      return;
+    }
+
+    const uptime = ((44640 - downtime) / 44640) * 100;
+    const threshold = 44640 * (1 - profile.commitment / 100);
+    const isEligible = uptime < profile.commitment;
+
+    result.className = 'alert ' + (isEligible ? 'ok' : 'info');
+    result.style.display = 'flex';
+    if (isEligible) {
+      result.innerHTML =
+        '<span class="icon">&#9989;</span><div><strong>เข้าเกณฑ์ยื่นขอ Service Credit เบื้องต้น</strong><br>' +
+        profile.label + ': Uptime ที่คำนวณได้ <strong>' + uptime.toFixed(5) + '%</strong> ซึ่งต่ำกว่า SLA ' + profile.commitment + '% ' +
+        '(Downtime เกิน ' + threshold.toFixed(3) + ' นาที) ระดับเครดิตแรกตามโปรไฟล์นี้คือ ' + profile.firstCredit +
+        '%. ตรวจสอบ service, tier, architecture, exclusions และวิธีวัดใน SLA ก่อนยื่นคำขอ</div>';
+    } else {
+      result.innerHTML =
+        '<span class="icon">&#8505;&#65039;</span><div><strong>ยังไม่ต่ำกว่า SLA ที่เลือก</strong><br>' +
+        'Uptime ที่คำนวณได้ <strong>' + uptime.toFixed(5) + '%</strong>; SLA ที่เลือกคือ ' + profile.commitment +
+        '%. สำหรับเดือนตุลาคม Downtime ต้องมากกว่า ' + threshold.toFixed(3) + ' นาทีจึงจะต่ำกว่า SLA นี้</div>';
+    }
+  }
+
   /* ===== SLA CALCULATOR ===== */
   let lastCalculation = null;
 
@@ -1193,20 +1335,36 @@
     const uptime = ((totalMin - netDownMin) / totalMin) * 100;
     const uptimeFmt = uptime.toFixed(4);
 
-    // Credit tier
+    // Credit tier: Azure's common 99.9% profile differs from the standard M365/Dynamics/Intune profile.
     let creditPct = 0, tier = 'none', verdictText = '', verdictClass = 'ok';
     if (uptime >= 99.9) {
       creditPct = 0; tier = 'none';
       verdictText = '&#9989; SLA ผ่าน — Uptime เป็นไปตาม Commitment';
       verdictClass = 'ok';
-    } else if (uptime >= 99.0) {
-      creditPct = 10; tier = 'tier1';
-      verdictText = '&#9888;&#65039; SLA ละเมิด — ต่ำกว่า 99.9%';
-      verdictClass = 'warn';
+    } else if (service === 'azure') {
+      if (uptime >= 99.0) {
+        creditPct = 10; tier = 'tier1';
+        verdictText = '&#9888;&#65039; SLA ละเมิด — ต่ำกว่า 99.9%';
+        verdictClass = 'warn';
+      } else {
+        creditPct = 25; tier = 'tier2';
+        verdictText = '&#10060; SLA ละเมิดร้ายแรง — ต่ำกว่า 99%';
+        verdictClass = 'fail';
+      }
     } else {
-      creditPct = 25; tier = 'tier2';
-      verdictText = '&#10060; SLA ละเมิดร้ายแรง — ต่ำกว่า 99%';
-      verdictClass = 'fail';
+      if (uptime >= 99.0) {
+        creditPct = 25; tier = 'tier1';
+        verdictText = '&#9888;&#65039; SLA ละเมิด — ต่ำกว่า 99.9%';
+        verdictClass = 'warn';
+      } else if (uptime >= 95.0) {
+        creditPct = 50; tier = 'tier2';
+        verdictText = '&#10060; SLA ละเมิดร้ายแรง — ต่ำกว่า 99%';
+        verdictClass = 'fail';
+      } else {
+        creditPct = 100; tier = 'tier2';
+        verdictText = '&#10060; SLA ละเมิดร้ายแรง — ต่ำกว่า 95%';
+        verdictClass = 'fail';
+      }
     }
 
     // Allowed downtime for 99.9%
