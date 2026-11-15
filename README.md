@@ -12,8 +12,17 @@
 - แสดงผล Uptime, SLA threshold, ระดับเครดิตโดยประมาณ และจำนวนเครดิตจากค่าบริการรายเดือน
 - มีตารางและตัวตรวจสอบเกณฑ์ SLA เดือนตุลาคม (31 วัน) สำหรับ Microsoft 365, Dynamics 365, Intune และ Azure SLA profiles
 - สร้างร่างภาษาอังกฤษสำหรับเปิด Support Ticket / ขอ SLA Service Credit พร้อมรายการรายละเอียดที่ควรระบุและปุ่มคัดลอก
+- คู่มือเฉพาะสำหรับ **CSP Partner** ยื่น Credit Request ผ่าน Partner Center: prerequisites, GDAP, ตารางเลือกเส้นทาง ticket, 8 ขั้นตอนโดยละเอียด, Required Information และ Evidence ของผลกระทบ
 - สรุปช่วงเวลาสำหรับยื่นคำขอ: Azure ภายใน 60 วันนับจาก Incident; บริการอื่นภายในสิ้นสุด Applicable Period ถัดจากเดือนที่เกิด Incident
 - รวมลิงก์เอกสารอ้างอิงจาก Microsoft และ Microsoft Learn
+
+### ประสบการณ์ใช้งาน (UX / UI)
+
+- **ปรับขนาดอัตโนมัติ** รองรับทั้งมือถือ แท็บเล็ต และเดสก์ท็อป ด้วย fluid typography (`clamp()`) และ grid แบบ `auto-fit/minmax()`
+- **Dark Mode** พร้อมปุ่มสลับที่มุมบนขวา (จำค่าใน `localStorage` และ auto-detect `prefers-color-scheme`)
+- **Sticky Nav** แบบ glassmorphism (backdrop-filter) ที่เลื่อนแนวนอนบนมือถือและ wrap ตรงกลางบนเดสก์ท็อป
+- **Accessibility**: `:focus-visible` ring ชัดเจน, รองรับ `prefers-reduced-motion`, `aria-label` บนปุ่ม toggle
+- **Print-friendly**: ปุ่มและ toggle ซ่อนอัตโนมัติเมื่อสั่งพิมพ์
 
 ## เริ่มใช้งาน
 
@@ -111,6 +120,54 @@
 
 ร่างข้อความจะดึงรายละเอียดการคำนวณที่ทำไว้ ได้แก่ billing month, downtime, planned maintenance, net downtime, monthly uptime และเครดิตโดยประมาณมาใส่ให้อัตโนมัติ ทั้งนี้ต้องตรวจสอบความถูกต้องและเงื่อนไข SLA ฉบับล่าสุดก่อนส่งเสมอ
 
+## CSP Partner: ขอ Credit ผ่าน Partner Center
+
+ในหน้าเว็บมีหัวข้อ **ขอเคลม** → การ์ด *CSP Partner: ขอ Credit ผ่าน Partner Center (ฉบับละเอียด)* ซึ่งสรุปขั้นตอนตามเอกสาร Microsoft Learn ไว้ครบ ใช้เป็น checklist ก่อนเปิด ticket จริง
+
+### ใครยื่นได้ / ยื่นไม่ได้
+
+- ✅ **CSP Direct Provider** และ **CSP Indirect Provider** ยื่นได้
+- ❌ **Indirect Reseller** ยื่นเองไม่ได้ — ต้องให้ Indirect Provider เป็นผู้ยื่น
+- ❌ ลูกค้าปลายทางไม่สามารถยื่น Credit ผ่าน Partner Center ได้ (ต้องยื่นผ่าน portal ของบริการที่ตนซื้อโดยตรง)
+
+### Prerequisites ก่อนเปิด Ticket
+
+- บัญชีของคุณต้องมี **Admin agent role** ใน Partner Center
+- มี **GDAP relationship** ที่ active กับ tenant ลูกค้า (เช่น `Service support administrator`)
+- สำหรับ Azure: ต้องเป็นผู้ให้บริการ Azure Subscription + มี **RBAC** บน subscription นั้น
+- มี **email จากลูกค้า** ที่ส่งจาก domain ของ tenant ที่ได้รับผลกระทบจริง (ไม่รับ personal email)
+- ยืนยันว่า Incident ไม่ใช่ **Advisory** เพียงอย่างเดียว
+
+### เส้นทาง Ticket
+
+| บริการ | เส้นทาง | Topic |
+| --- | --- | --- |
+| Microsoft 365 / Office 365 / Dynamics 365 / Intune / EMS | Partner Center → Help + support → Create request | *Cancel, Credit or suspend (non-Azure) subscriptions* |
+| Microsoft Azure | Partner Center → Administer customer → New support request (เปิดใน Azure Portal context ของ partner) | Issue type: *Billing* → Problem type: *Refund Request* |
+
+### เอกสาร 2 ชุดที่ต้องแนบ
+
+**ชุดที่ 1 — Required Information**
+
+1. Customer Tenant GUID
+2. Outage Incident Identifier (เช่น `EX25194`)
+3. หลักฐานว่าลูกค้าได้รับผลกระทบและขอ Credit
+4. ระบุว่า subscription ซื้อผ่าน CSP หรือไม่ (Yes/No)
+
+**ชุดที่ 2 — Evidence of Customer Impact**
+
+1. Time & duration ของ downtime พร้อม timezone
+2. จำนวนและที่ตั้งของ users ที่ได้รับผลกระทบ
+3. Troubleshooting ที่ทำระหว่างเกิดเหตุ (retry, failover, workaround)
+4. Email จากลูกค้าจาก domain ของ tenant ที่ได้รับผลกระทบ (ขอ support + credit)
+5. Support ticket number และบันทึก contact กับลูกค้า
+
+> ⚠️ ข้อมูลเหล่านี้ **ไม่เพียงพอ** สำหรับการ process: ชื่อลูกค้า + Tenant ID + Partner Ticket Number + Ticket created timestamp *เพียงเท่านี้* Microsoft จะ reject หรือทวงหลักฐานเพิ่ม
+
+### หลังได้รับอนุมัติ
+
+Credit จะถูก prorate ตามบริการที่กระทบและ duration ของ outage แล้วปรากฏใน invoice ถัดไปและ **Reconciliation File** ที่ Partner Center → *Billing → Invoices & reconciliation* ใช้ไฟล์นี้ map กลับไปยัง customer/subscription เพื่อออก credit note ให้ลูกค้าปลายทาง
+
 ## สูตรคำนวณ
 
 ```text
@@ -149,8 +206,10 @@ Monthly Uptime Percentage =
 
 - [Service Level Agreements (SLA) for Online Services — Microsoft Online Services SLA (WW), October 2026](https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services)
 - [How to read a Service-Level Agreement (SLA)](https://learn.microsoft.com/azure/reliability/concept-service-level-agreements)
-- [Request a credit from Microsoft](https://learn.microsoft.com/en-us/partner-center/request-credit)
-- [Report a service problem on behalf of a customer](https://learn.microsoft.com/en-us/partner-center/customers/report-problems-on-behalf-of-a-customer)
+- [How and when to request a credit from Microsoft — Partner Center](https://learn.microsoft.com/partner-center/billing/request-credit)
+- [Report a service problem on behalf of a customer — Partner Center](https://learn.microsoft.com/partner-center/customers/report-problems-on-behalf-of-a-customer)
+- [GDAP Least Privileged Roles by Task](https://learn.microsoft.com/partner-center/gdap-least-privileged-roles-by-task)
+- [Partner Center — Create Credit Request (non-Azure) โดยตรง](https://partner.microsoft.com/dashboard/support/servicerequests/create?stage=2&topicid=c65fe2c7-105c-aafc-2f8c-3d3acecb2e4a)
 
 ## โครงสร้างโปรเจกต์
 
