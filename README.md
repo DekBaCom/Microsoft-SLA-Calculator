@@ -12,7 +12,7 @@
 - แสดงผล Uptime, SLA threshold, ระดับเครดิตโดยประมาณ และจำนวนเครดิตจากค่าบริการรายเดือน
 - มีตารางและตัวตรวจสอบเกณฑ์ SLA เดือนตุลาคม (31 วัน) สำหรับ Microsoft 365, Dynamics 365, Intune และ Azure SLA profiles
 - สร้างร่างภาษาอังกฤษสำหรับเปิด Support Ticket / ขอ SLA Service Credit พร้อมรายการรายละเอียดที่ควรระบุและปุ่มคัดลอก
-- สรุปช่วงเวลาสำหรับยื่นคำขอ: Azure ภายใน 2 เดือน และบริการอื่นภายใน 1 เดือน นับจากสิ้นสุด billing month ที่เกิดเหตุการณ์
+- สรุปช่วงเวลาสำหรับยื่นคำขอ: Azure ภายใน 60 วันนับจาก Incident; บริการอื่นภายในสิ้นสุด Applicable Period ถัดจากเดือนที่เกิด Incident
 - รวมลิงก์เอกสารอ้างอิงจาก Microsoft และ Microsoft Learn
 
 ## เริ่มใช้งาน
@@ -83,7 +83,7 @@
 - **SLA threshold / เวลาที่ยังอยู่ใน SLA**: ค่าเป้าหมาย SLA และเวลาที่ downtime ยังไม่ทำให้ต่ำกว่าค่าเป้าหมาย
 - **ระดับเครดิตโดยประมาณ**: ระดับ Service Credit ที่เครื่องมือประเมินจากค่า Uptime
 - **เครดิตโดยประมาณ**: มูลค่าเครดิตจากระดับเครดิตและค่าบริการรายเดือนที่กรอกไว้
-- **ช่วงเวลายื่นคำขอ**: กำหนดเวลาประมาณการสำหรับยื่นคำขอเครดิต โดย Azure ภายใน 2 เดือน และบริการอื่นภายใน 1 เดือนนับจากสิ้นสุด billing month
+- **ช่วงเวลายื่นคำขอ**: กำหนดเวลาสำหรับยื่นคำขอเครดิต โดย Azure ภายใน 60 วันนับจาก Incident; บริการอื่นภายในสิ้นสุด Applicable Period ถัดจากเดือนที่เกิด Incident
 
 ### 9. ตรวจสอบก่อนยื่นคำขอ
 
@@ -126,11 +126,16 @@ Monthly Uptime Percentage =
 
 ในหน้าเว็บเปิดเมนู **SLA ตุลาคม** เพื่อดูว่า Downtime ต้องเกินเท่าใดจึงเริ่มต่ำกว่า SLA และใช้ตัวตรวจสอบเบื้องต้นได้ทันที
 
+1. เลือกโปรไฟล์ SLA ที่ตรงกับบริการและรูปแบบ deployment ของคุณ
+2. กรอก Net Downtime เป็นหน่วยนาทีหลังหัก Planned / Scheduled Maintenance ที่เข้าเงื่อนไข
+3. กดปุ่มตรวจเกณฑ์ เพื่อเปรียบเทียบ Monthly Uptime กับ commitment ของเดือนตุลาคม
+4. ก่อนยื่นเคลม ให้ยืนยัน service, tier, architecture, วิธีวัด และ exclusions จาก SLA ของ resource นั้น
+
 - เดือนตุลาคมมี 44,640 นาที; SLA 99.9% จะต่ำกว่า commitment เมื่อ Downtime เกิน 44 นาที 38.4 วินาที (หากวัดเป็นจำนวนนาที ให้ใช้ 45 นาทีขึ้นไป)
 - Microsoft 365, Dynamics 365 และ Intune ในโปรไฟล์มาตรฐานใช้ 99.9% และระดับเครดิต 25% / 50% / 100% เมื่อ Uptime ต่ำกว่า 99.9% / 99% / 95% ตามลำดับ
 - Azure ไม่มีค่า SLA เดียวสำหรับทุกบริการ; ตารางนี้ใช้ตัวอย่างโปรไฟล์ 99.9%, 99.95% และ 99.99% จากบริการที่ระบุในเอกสาร ซึ่งขึ้นกับ service, tier และ architecture
 
-ข้อมูลในตารางอ้างอิงจากเอกสาร Microsoft Online Services SLA (WW) ฉบับ October 2026 ต้องตรวจสอบหัวข้อ SLA ของ service/resource ที่ใช้จริงก่อนยื่นคำขอ เนื่องจากบางบริการวัดด้วย request/error rate หรือมีเงื่อนไขเฉพาะ
+ข้อมูลในตารางอ้างอิงจากเอกสาร Microsoft Online Services SLA (WW) ฉบับ October 2026 ต้องตรวจสอบหัวข้อ SLA ของ service/resource ที่ใช้จริงก่อนยื่นคำขอ เนื่องจากบางบริการวัดด้วย request/error rate หรือมีเงื่อนไขเฉพาะ ค่า 99.999% พร้อมเครดิต 5% ที่พบในเอกสารเป็นเงื่อนไขเฉพาะของ Teams Calling/Phone/Audio Conferencing จึงไม่รวมเป็น Azure profile ทั่วไป
 
 ## ข้อควรระวัง
 
@@ -142,7 +147,7 @@ Monthly Uptime Percentage =
 
 ## แหล่งอ้างอิง
 
-- [Service Level Agreements (SLA) for Online Services](https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services)
+- [Service Level Agreements (SLA) for Online Services — Microsoft Online Services SLA (WW), October 2026](https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services)
 - [How to read a Service-Level Agreement (SLA)](https://learn.microsoft.com/azure/reliability/concept-service-level-agreements)
 - [Request a credit from Microsoft](https://learn.microsoft.com/en-us/partner-center/request-credit)
 - [Report a service problem on behalf of a customer](https://learn.microsoft.com/en-us/partner-center/customers/report-problems-on-behalf-of-a-customer)
