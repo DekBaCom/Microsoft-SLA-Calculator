@@ -21,6 +21,7 @@
 ### ประสบการณ์ใช้งาน (UX / UI)
 
 - **ปรับขนาดอัตโนมัติ** รองรับทั้งมือถือ แท็บเล็ต และเดสก์ท็อป ด้วย fluid typography (`clamp()`) และ grid แบบ `auto-fit/minmax()`
+- **สองภาษา (ไทย / English)** ปุ่มสลับภาษา (EN / ไทย) ที่มุมบนขวาข้างปุ่ม theme — ไทยเป็น default, จำค่าใน `localStorage` key `sla-lang` และตั้ง `html[data-ui-lang]` เพื่อสลับผ่าน CSS (`.lang-th` / `.lang-en`); ขั้นแรกแปลครอบคลุม header, top/side nav, h2 ทุก section, ปุ่มหลัก, footer และข้อความใน JS (alerts/status) — เนื้อหารายละเอียดเชิงลึกยังเป็นไทยและเพิ่ม EN ได้ incremental
 - **Dark Mode** พร้อมปุ่มสลับที่มุมบนขวา (จำค่าใน `localStorage` และ auto-detect `prefers-color-scheme`)
 - **Sticky Nav** แบบ glassmorphism (backdrop-filter) ที่เลื่อนแนวนอนบนมือถือและ wrap ตรงกลางบนเดสก์ท็อป
 - **Floating Side-Nav** แถบนำทางด้านขวาแบบ **text pills** ที่ปรากฏเมื่อเลื่อนลงเกิน 320px — แสดงชื่อ section ทุกอันตลอดเวลา (ไม่ใช่แค่ hover) และ pill ของ section ที่กำลังดูจะเป็น **สีน้ำเงินเข้มแบบนูน** (dark gradient + layered inset/drop shadow + glow bar ด้านซ้าย + pulsing ring + bold text-shadow) sync กับ top nav อัตโนมัติผ่าน `IntersectionObserver` และซ่อนบนจอ ≤ 960px
