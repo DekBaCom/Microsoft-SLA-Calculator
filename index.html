@@ -946,13 +946,13 @@
 <nav class="side-nav" id="side-nav" aria-label="นำทางหน้าแบบเลื่อน">
   <a href="#overview">ภาพรวม SLA</a>
   <a href="#october-sla">SLA ตุลาคม</a>
-  <a href="#detect">ตรวจจับ Outage</a>
+  <a href="#detect">1 · ตรวจจับ Outage</a>
   <a href="#health-types">ประเภทใน Service Health</a>
-  <a href="#evaluate">ประเมิน SLA</a>
-  <a href="#evidence">รวบรวมหลักฐาน</a>
-  <a href="#claim">ขอเคลม</a>
-  <a href="#workflow-request">Workflow: Direct/CSP/EA</a>
+  <a href="#evaluate">2 · ประเมิน SLA</a>
   <a href="#calculator">คำนวณ SLA</a>
+  <a href="#evidence">3 · รวบรวมหลักฐาน</a>
+  <a href="#workflow-request">Workflow: Direct/CSP/EA</a>
+  <a href="#claim">4 · ขอเคลม</a>
   <a href="#ticket-template">สร้าง Ticket</a>
   <a href="#deadline">กำหนดเวลา</a>
   <a href="#abbrev">รหัส Incident</a>
@@ -968,19 +968,19 @@
 
 <!-- TAB NAV -->
 <nav class="tabs">
-  <a href="#overview" class="active">ภาพรวม SLA</a>
+  <a href="#overview" class="active">&#127775; ภาพรวม SLA</a>
   <a href="#october-sla">&#128197; SLA ตุลาคม</a>
-  <a href="#detect">ตรวจจับ Outage</a>
+  <a href="#detect">&#128270; 1 · ตรวจจับ Outage</a>
   <a href="#health-types">&#128737;&#65039; ประเภทใน Service Health</a>
-  <a href="#evaluate">ประเมิน SLA</a>
-  <a href="#evidence">รวบรวมหลักฐาน</a>
-  <a href="#claim">ขอเคลม</a>
-  <a href="#workflow-request">&#128230; Workflow: Direct/CSP/EA</a>
-  <a href="#deadline">กำหนดเวลา</a>
+  <a href="#evaluate">&#128202; 2 · ประเมิน SLA</a>
   <a href="#calculator">&#129518; คำนวณ SLA</a>
+  <a href="#evidence">&#128196; 3 · รวบรวมหลักฐาน</a>
+  <a href="#workflow-request">&#128230; Workflow: Direct/CSP/EA</a>
+  <a href="#claim">&#127381; 4 · ขอเคลม</a>
   <a href="#ticket-template">&#128221; สร้าง Ticket</a>
-  <a href="#abbrev">รหัส Incident</a>
-  <a href="#sources">แหล่งอ้างอิง</a>
+  <a href="#deadline">&#9201;&#65039; กำหนดเวลา</a>
+  <a href="#abbrev">&#128204; รหัส Incident</a>
+  <a href="#sources">&#128279; แหล่งอ้างอิง</a>
 </nav>
 
 <main>
@@ -1433,6 +1433,146 @@
     </div>
   </section>
 
+  <!-- ====== CALCULATOR ====== -->
+  <section id="calculator">
+    <h2>&#129518; SLA Calculator — คำนวณ Uptime และ Credit</h2>
+
+    <div class="calc-section">
+      <div class="calc-grid">
+
+        <!-- Service Type -->
+        <div class="field">
+          <label for="cal-service">บริการ Microsoft</label>
+          <select id="cal-service">
+            <option value="m365">Microsoft 365 / Office 365</option>
+            <option value="azure">Microsoft Azure</option>
+            <option value="dynamics">Dynamics 365</option>
+            <option value="other">บริการอื่น ๆ</option>
+          </select>
+          <span class="hint">ใช้กำหนด deadline การเคลม</span>
+        </div>
+
+        <!-- Month -->
+        <div class="field">
+          <label for="cal-month">เดือนที่เกิด Outage</label>
+          <select id="cal-month">
+            <option value="31">มกราคม (31 วัน)</option>
+            <option value="28">กุมภาพันธ์ (28 วัน)</option>
+            <option value="29">กุมภาพันธ์ — ปีอธิกสุรทิน (29 วัน)</option>
+            <option value="31">มีนาคม (31 วัน)</option>
+            <option value="30">เมษายน (30 วัน)</option>
+            <option value="31">พฤษภาคม (31 วัน)</option>
+            <option value="30">มิถุนายน (30 วัน)</option>
+            <option value="31">กรกฎาคม (31 วัน)</option>
+            <option value="31">สิงหาคม (31 วัน)</option>
+            <option value="30">กันยายน (30 วัน)</option>
+            <option value="31">ตุลาคม (31 วัน)</option>
+            <option value="30">พฤศจิกายน (30 วัน)</option>
+            <option value="31">ธันวาคม (31 วัน)</option>
+          </select>
+          <span class="hint">ใช้คำนวณ Total Billable Minutes</span>
+        </div>
+
+        <!-- Downtime -->
+        <div class="field">
+          <label>เวลา Downtime จริง (ที่ Microsoft ยืนยัน)</label>
+          <div class="downtime-row">
+            <input type="number" id="cal-dt-h" min="0" max="744" placeholder="0" value="0" />
+            <span>ชั่วโมง</span>
+            <input type="number" id="cal-dt-m" min="0" max="59" placeholder="0" value="0" />
+            <span>นาที</span>
+          </div>
+          <span class="hint">ดูจาก Post Incident Review (PIR) ใน Service Health Dashboard</span>
+        </div>
+
+        <!-- Planned Maintenance exclusion -->
+        <div class="field">
+          <label>หักเวลา Planned Maintenance (ถ้ามี)</label>
+          <div class="downtime-row">
+            <input type="number" id="cal-maint-h" min="0" max="24" placeholder="0" value="0" />
+            <span>ชั่วโมง</span>
+            <input type="number" id="cal-maint-m" min="0" max="59" placeholder="0" value="0" />
+            <span>นาที</span>
+          </div>
+          <span class="hint">ช่วงที่ Microsoft แจ้งล่วงหน้า — ไม่นับใน SLA</span>
+        </div>
+
+        <!-- Monthly cost -->
+        <div class="field field-full">
+          <label for="cal-cost">ค่าบริการรายเดือน (USD) — สำหรับคำนวณวงเงิน Credit</label>
+          <input type="number" id="cal-cost" min="0" placeholder="เช่น 1500" value="" />
+          <span class="hint">ใส่ 0 หรือเว้นว่างถ้าไม่ต้องการคำนวณวงเงิน</span>
+        </div>
+
+      </div>
+
+      <button class="btn-calc" onclick="calcSLA()">&#9654;&#65039; คำนวณ SLA</button>
+      <button class="btn-reset" onclick="resetCalc()">&#8635; รีเซ็ต</button>
+
+      <!-- RESULT -->
+      <div id="calc-result">
+
+        <div class="result-hero">
+          <div>
+            <div id="res-pct" class="result-pct ok">99.99%</div>
+            <div style="font-size:.8rem;color:var(--ms-gray);text-align:center;margin-top:.2rem">Monthly Uptime</div>
+          </div>
+          <div id="res-verdict" class="result-verdict ok">SLA ผ่าน</div>
+        </div>
+
+        <!-- Gauge -->
+        <div class="gauge-wrap">
+          <div class="gauge-track">
+            <div id="res-gauge" class="gauge-fill" style="width:100%;background:var(--ms-green)"></div>
+          </div>
+          <div class="gauge-labels">
+            <span>99%</span>
+            <span>99.9%</span>
+            <span>99.99%</span>
+            <span>100%</span>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="result-stats">
+          <div class="stat-box">
+            <div class="stat-val" id="res-total-min">—</div>
+            <div class="stat-lbl">Total Billable Minutes</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="res-down-min">—</div>
+            <div class="stat-lbl">Downtime Minutes (หลังหัก)</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="res-down-fmt">—</div>
+            <div class="stat-lbl">ระยะเวลา Downtime</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="res-allowed">—</div>
+            <div class="stat-lbl">Downtime ที่ยังอยู่ใน SLA 99.9%</div>
+          </div>
+        </div>
+
+        <!-- Credit box -->
+        <div id="res-credit-box" class="credit-box none">
+          <div id="res-credit-pct" class="credit-pct">ไม่ได้ Credit</div>
+          <div id="res-credit-amt" class="credit-amt"></div>
+          <div id="res-credit-note" class="credit-note"></div>
+        </div>
+
+        <!-- Deadline reminder -->
+        <div id="res-deadline" class="deadline-box">
+          <span>&#128197;</span>
+          <span id="res-deadline-text"></span>
+        </div>
+
+        <!-- Show formula used -->
+        <div class="calc-box" style="margin-top:1rem;font-size:.85rem" id="res-formula-box"></div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- ====== EVIDENCE ====== -->
   <section id="evidence">
     <h2>&#128196; ขั้นตอนที่ 3 — รวบรวมหลักฐาน</h2>
@@ -1457,294 +1597,6 @@
       <div>
         <strong>ไม่เพียงพอ:</strong> ชื่อลูกค้า, Tenant ID, Partner Ticket Number และ Ticket Timestamp
         <strong>ไม่เพียงพอ</strong>สำหรับ process credit — ต้องมีหลักฐานจากรายการด้านบนครบถ้วน
-      </div>
-    </div>
-  </section>
-
-  <!-- ====== CLAIM ====== -->
-  <section id="claim">
-    <h2>&#127381; ขั้นตอนที่ 4 — วิธีการเคลม SLA Credit</h2>
-
-    <div class="grid-2">
-      <!-- Azure -->
-      <div class="card blue-top">
-        <h3>&#9729;&#65039; Microsoft Azure</h3>
-        <div class="steps">
-          <div class="step">
-            <div class="step-num"></div>
-            <div class="step-body">Sign in ที่ <strong>Azure Portal</strong> ด้วย account ที่ได้รับผลกระทบ</div>
-          </div>
-          <div class="step">
-            <div class="step-num"></div>
-            <div class="step-body">ไปที่ <strong>Help + Support → New Support Request</strong></div>
-          </div>
-          <div class="step">
-            <div class="step-num"></div>
-            <div class="step-body">เลือก <strong>Issue type: Billing</strong> → Problem type: <strong>Refund Request</strong></div>
-          </div>
-          <div class="step">
-            <div class="step-num"></div>
-            <div class="step-body">ระบุว่าขอ SLA credit พร้อม <strong>วันที่/เวลา/timezone</strong> และ impacted services</div>
-          </div>
-          <div class="step">
-            <div class="step-num"></div>
-            <div class="step-body">ตรวจสอบ contact details → <strong>Create</strong></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- M365 / O365 -->
-      <div class="card green-top">
-        <h3>&#128188; Microsoft 365 / Office 365 / Dynamics CRM</h3>
-        <div class="steps">
-          <div class="step">
-            <div class="step-num"></div>
-            <div class="step-body">ไปที่ <strong>Partner Center</strong> (สำหรับ CSP Partner)</div>
-          </div>
-          <div class="step">
-            <div class="step-num"></div>
-            <div class="step-body">เลือก Customer → <strong>Service Request → New Request</strong></div>
-          </div>
-          <div class="step">
-            <div class="step-num"></div>
-            <div class="step-body">เลือก workload ที่ได้รับผลกระทบ — portal จะ redirect ไปยัง workload portal</div>
-          </div>
-          <div class="step">
-            <div class="step-num"></div>
-            <div class="step-body">กรอกข้อมูล — ใส่ <strong>contact ของ Partner</strong> ไม่ใช่ contact ลูกค้า</div>
-          </div>
-          <div class="step">
-            <div class="step-num"></div>
-            <div class="step-body">Submit → ติดตาม ticket ใน M365 Admin Center <strong>→ Support Tickets</strong></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card yellow-top" style="margin-top:.5rem">
-      <h3>&#128204; CSP Partner: ขอ Credit ผ่าน Partner Center (ฉบับละเอียด)</h3>
-
-      <p style="margin-bottom:.8rem;color:var(--text-muted);font-size:.93rem">
-        CSP Partner ยื่นขอ SLA Service Credit แทนลูกค้าผ่าน <strong>Partner Center</strong> ได้ทั้งบริการใน
-        <em>legacy commerce experience</em> และ <em>new commerce experience (NCE)</em>
-        นโยบายใช้ร่วมกัน แต่เส้นทางเปิด Ticket และบทบาท (role) ที่ต้องใช้แตกต่างกันตามประเภทบริการ
-      </p>
-
-      <!-- Who can request -->
-      <div class="alert warn" style="margin-bottom:1rem">
-        <span class="icon">&#9888;&#65039;</span>
-        <div>
-          <strong>ใครยื่นได้ / ยื่นไม่ได้</strong><br>
-          &#9989; <strong>CSP Direct Provider</strong> และ <strong>CSP Indirect Provider</strong> (เจ้าของ subscription ที่ bill ลูกค้า)<br>
-          &#10060; <strong>Indirect Reseller</strong> ยื่นเองไม่ได้ ต้องให้ Indirect Provider เป็นผู้ยื่น<br>
-          &#10060; ลูกค้าไม่สามารถยื่น Credit ให้ตัวเองผ่าน Partner Center ได้ (ยื่นผ่าน portal ของบริการที่ตนซื้อโดยตรงเท่านั้น)
-        </div>
-      </div>
-
-      <!-- Prerequisites -->
-      <h3 style="margin-top:.6rem">&#128274; Prerequisites — สิ่งที่ต้องมีก่อนเปิด Ticket</h3>
-      <ul class="checklist">
-        <li><span class="cb"></span><div>บัญชีของคุณต้องมี <strong>Admin agent role</strong> ใน Partner Center</div></li>
-        <li><span class="cb"></span><div>มี <strong>GDAP relationship ที่ active</strong> กับ tenant ลูกค้า (เช่น <code>Service support administrator</code> หรือ role ที่น้อยที่สุดตาม GDAP guidance)</div></li>
-        <li><span class="cb"></span><div>สำหรับ <strong>Azure</strong>: ต้องเป็นผู้ให้บริการ Azure Subscription (CSP Direct/Indirect Provider) + มี <strong>RBAC</strong> บน subscription นั้น</div></li>
-        <li><span class="cb"></span><div>มี <strong>email ของลูกค้า</strong> ที่ส่งจาก domain ของ tenant ที่ได้รับผลกระทบจริง (ไม่รับ personal email)</div></li>
-        <li><span class="cb"></span><div>ยืนยันว่า Incident ไม่ใช่ <strong>Advisory</strong> เพียงอย่างเดียว (Advisory incidents โดยปกติ <em>ไม่มีสิทธิ์</em>ขอ Credit)</div></li>
-      </ul>
-
-      <!-- Routing table -->
-      <h3>&#128230; เลือกเส้นทาง Ticket ให้ถูกต้อง</h3>
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>บริการที่ได้รับผลกระทบ</th>
-              <th>เส้นทางที่ถูกต้อง</th>
-              <th>Topic / Category</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Microsoft 365 / Office 365 / Dynamics 365 / Intune / EMS</strong></td>
-              <td>Partner Center → Help + support → New request</td>
-              <td><span class="tag tag-blue">Cancel, Credit or suspend (non-Azure) subscriptions</span></td>
-            </tr>
-            <tr>
-              <td><strong>Microsoft Azure</strong></td>
-              <td>Partner Center → Administer customer → New support request (เปิดใน Azure Portal context ของ partner)</td>
-              <td><span class="tag tag-blue">Issue type: Billing → Problem type: Refund Request</span></td>
-            </tr>
-            <tr>
-              <td><strong>Legacy subscription ที่เลิกสนับสนุน</strong></td>
-              <td>Partner Center Support Ticket (commercial)</td>
-              <td><span class="tag tag-orange">Billing &amp; subscription management</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Step-by-step detailed -->
-      <h3>&#9881;&#65039; ขั้นตอนโดยละเอียด (8 ขั้น)</h3>
-      <div class="steps">
-        <div class="step">
-          <div class="step-num"></div>
-          <div class="step-body">
-            <strong>ยืนยันสิทธิ์และ GDAP</strong>
-            Sign in <a href="https://partner.microsoft.com/dashboard" target="_blank" rel="noopener">partner.microsoft.com/dashboard</a>
-            ตรวจ role (Admin agent) และสถานะ GDAP กับลูกค้า หาก GDAP หมดอายุต้องขอใหม่ก่อน
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num"></div>
-          <div class="step-body">
-            <strong>ยืนยัน Incident ID และขอบเขต</strong>
-            ตรวจ Service Health Dashboard ของลูกค้า → บันทึก <code>Incident ID</code> (เช่น <code>EX25194</code>) และระบุว่าได้รับผลกระทบ <em>จริง</em> (ไม่ใช่ Advisory)
-            และรอ Post Incident Review (PIR) หากยังไม่ปิด
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num"></div>
-          <div class="step-body">
-            <strong>รวบรวมหลักฐานตาม 2 ชุดด้านล่าง</strong>
-            ทั้งชุด <em>Required information</em> และชุด <em>Evidence that proves customer impact</em> ต้องครบก่อนเปิด ticket เพื่อลด back-and-forth
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num"></div>
-          <div class="step-body">
-            <strong>เปิด Ticket สำหรับ non-Azure</strong>
-            ไปที่ <a href="https://partner.microsoft.com/dashboard/support/servicerequests/create?stage=2&amp;topicid=c65fe2c7-105c-aafc-2f8c-3d3acecb2e4a" target="_blank" rel="noopener">Partner Center → Help + support → Create request</a>
-            → เลือก topic <strong>“Cancel, Credit or suspend (non-Azure) subscriptions”</strong>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num"></div>
-          <div class="step-body">
-            <strong>เปิด Ticket สำหรับ Azure</strong>
-            ไปที่ Partner Center → เลือก Customer → <strong>Service management → Administer services</strong> → เปิด Azure portal ใน context ลูกค้า
-            → <strong>Help + Support → New Support Request</strong> → Issue type: <strong>Billing</strong>, Problem type: <strong>Refund Request</strong>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num"></div>
-          <div class="step-body">
-            <strong>กรอก Contact ด้วยข้อมูล Partner</strong>
-            ใส่ชื่อ/อีเมลของ <em>Partner</em> เป็นผู้ติดต่อหลัก <strong>ไม่ใช่</strong>ลูกค้า
-            และเลือก Support Plan ที่เหมาะสม (MAICPP Partner Cloud Support หรือ paid support)
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num"></div>
-          <div class="step-body">
-            <strong>แนบหลักฐานและส่ง</strong>
-            Upload: PIR / Service Health screenshot, error logs, retry logs, email จาก tenant ลูกค้า, และ Support Ticket number เดิม (ถ้ามี)
-            → Submit
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num"></div>
-          <div class="step-body">
-            <strong>ติดตามและ reconcile</strong>
-            ติดตามสถานะที่ Partner Center → <strong>Service requests</strong>
-            หลังอนุมัติ Credit จะปรากฏใน <strong>invoice และ reconciliation file</strong> รอบถัดไป ดูใน Billing → Reconciliation
-          </div>
-        </div>
-      </div>
-
-      <!-- Required vs Evidence -->
-      <h3>&#128196; เอกสาร 2 ชุดที่ต้องแนบ</h3>
-      <div class="grid-2">
-        <div class="card blue-top" style="margin:0">
-          <strong style="color:var(--ms-blue)">ชุดที่ 1 — Required Information</strong>
-          <p style="font-size:.85rem;color:var(--text-muted);margin:.3rem 0 .6rem">ข้อมูลพื้นฐานที่ Microsoft กำหนดให้ระบุในทุก credit request</p>
-          <ul class="checklist">
-            <li><span class="cb"></span><div><strong>Customer Tenant GUID</strong></div></li>
-            <li><span class="cb"></span><div><strong>Outage Incident Identifier</strong> (เช่น <code>EX25194</code>)</div></li>
-            <li><span class="cb"></span><div>หลักฐานว่าลูกค้า <strong>ได้รับผลกระทบ</strong> และ <strong>ขอ Credit</strong></div></li>
-            <li><span class="cb"></span><div>ระบุว่า subscription <strong>ซื้อผ่าน CSP หรือไม่</strong> (Yes/No)</div></li>
-          </ul>
-        </div>
-        <div class="card green-top" style="margin:0">
-          <strong style="color:var(--ms-green)">ชุดที่ 2 — Evidence of Customer Impact</strong>
-          <p style="font-size:.85rem;color:var(--text-muted);margin:.3rem 0 .6rem">หลักฐานเชิงเทคนิค/ธุรกิจที่พิสูจน์ผลกระทบจริง</p>
-          <ul class="checklist">
-            <li><span class="cb"></span><div><strong>Time &amp; duration</strong> ของ downtime พร้อม timezone</div></li>
-            <li><span class="cb"></span><div><strong>จำนวนและที่ตั้ง</strong> ของ users ที่ได้รับผลกระทบ</div></li>
-            <li><span class="cb"></span><div><strong>Troubleshooting</strong> ที่ทำระหว่างเกิดเหตุ (retry, failover, workaround)</div></li>
-            <li><span class="cb"></span><div><strong>Email จากลูกค้า</strong> จาก domain ของ tenant ที่ได้รับผลกระทบ (ขอ support + credit)</div></li>
-            <li><span class="cb"></span><div><strong>Support ticket number</strong> และบันทึก contact กับลูกค้า</div></li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Not sufficient -->
-      <div class="alert danger" style="margin-top:1rem">
-        <span class="icon">&#10060;</span>
-        <div>
-          <strong>ข้อมูลต่อไปนี้ “ไม่เพียงพอ” สำหรับการ process:</strong><br>
-          ชื่อลูกค้า + Tenant ID + Partner Ticket Number + Ticket created timestamp <em>เพียงเท่านี้</em>
-          Microsoft จะ reject หรือทวงหลักฐานเพิ่ม ทำให้ ticket ค้างนานและอาจเลย deadline
-        </div>
-      </div>
-
-      <!-- Deadlines emphasised -->
-      <div class="alert warn" style="margin-top:.8rem">
-        <span class="icon">&#9201;&#65039;</span>
-        <div>
-          <strong>Deadline สำคัญ (เริ่มนับจากสิ้นสุด billing month ที่เกิด Incident):</strong><br>
-          &#8226; <strong>Microsoft Azure</strong> — ภายใน <strong>2 เดือน</strong><br>
-          &#8226; <strong>M365 / Dynamics 365 / Intune / บริการอื่น</strong> — ภายใน <strong>1 เดือน</strong><br>
-          นโยบายนี้ใช้กับทั้ง legacy commerce และ new commerce experience (NCE)
-        </div>
-      </div>
-
-      <!-- After approval -->
-      <div class="alert ok" style="margin-top:.8rem">
-        <span class="icon">&#128176;</span>
-        <div>
-          <strong>หลังได้รับอนุมัติ:</strong> Credit จะถูก prorate ตามบริการที่กระทบและ duration ของ outage
-          แล้วปรากฏใน <strong>invoice ถัดไป</strong> และ <strong>Reconciliation File</strong> ที่ Partner Center →
-          <em>Billing → Invoices &amp; reconciliation</em> ใช้ไฟล์นี้ map กลับไปยัง customer/subscription เพื่อออก credit note ให้ลูกค้าปลายทาง
-        </div>
-      </div>
-
-      <!-- Quick links -->
-      <h3>&#128279; Quick Links</h3>
-      <a class="source-link" href="https://partner.microsoft.com/dashboard/support/servicerequests/create?stage=2&amp;topicid=c65fe2c7-105c-aafc-2f8c-3d3acecb2e4a" target="_blank" rel="noopener">
-        <span class="src-icon">&#128221;</span>
-        <span>
-          <strong>Partner Center — สร้าง Credit Request (non-Azure) โดยตรง</strong>
-          <span class="src-url">partner.microsoft.com/dashboard/support/servicerequests/create</span>
-        </span>
-      </a>
-      <a class="source-link" href="https://learn.microsoft.com/partner-center/billing/request-credit" target="_blank" rel="noopener">
-        <span class="src-icon">&#128214;</span>
-        <span>
-          <strong>How and When to Request a Credit from Microsoft — Partner Center Docs</strong>
-          <span class="src-url">learn.microsoft.com/partner-center/billing/request-credit</span>
-        </span>
-      </a>
-      <a class="source-link" href="https://learn.microsoft.com/partner-center/customers/report-problems-on-behalf-of-a-customer" target="_blank" rel="noopener">
-        <span class="src-icon">&#128101;</span>
-        <span>
-          <strong>Report a Service Problem on Behalf of a Customer</strong>
-          <span class="src-url">learn.microsoft.com/partner-center/customers/report-problems-on-behalf-of-a-customer</span>
-        </span>
-      </a>
-      <a class="source-link" href="https://learn.microsoft.com/partner-center/gdap-least-privileged-roles-by-task" target="_blank" rel="noopener">
-        <span class="src-icon">&#128273;</span>
-        <span>
-          <strong>GDAP Least Privileged Roles by Task</strong>
-          <span class="src-url">learn.microsoft.com/partner-center/gdap-least-privileged-roles-by-task</span>
-        </span>
-      </a>
-    </div>
-
-    <div class="alert ok">
-      <span class="icon">&#9989;</span>
-      <div>
-        <strong>Credit จะครอบคลุมเฉพาะ service ที่ได้รับผลกระทบจริง:</strong>
-        เช่น ถ้า M365 Suite เจอปัญหาแค่ SharePoint — credit จะได้เฉพาะ SharePoint
-        ไม่ใช่ทั้ง suite และ <em>credit ไม่ครอบคลุม lost revenue หรือ reputational damage</em>
       </div>
     </div>
   </section>
@@ -1977,142 +1829,376 @@
     </a>
   </section>
 
-  <!-- ====== CALCULATOR ====== -->
-  <section id="calculator">
-    <h2>&#129518; SLA Calculator — คำนวณ Uptime และ Credit</h2>
+  <!-- ====== CLAIM ====== -->
+  <section id="claim">
+    <h2>&#127381; ขั้นตอนที่ 4 — วิธีการเคลม SLA Credit</h2>
 
-    <div class="calc-section">
-      <div class="calc-grid">
-
-        <!-- Service Type -->
-        <div class="field">
-          <label for="cal-service">บริการ Microsoft</label>
-          <select id="cal-service">
-            <option value="m365">Microsoft 365 / Office 365</option>
-            <option value="azure">Microsoft Azure</option>
-            <option value="dynamics">Dynamics 365</option>
-            <option value="other">บริการอื่น ๆ</option>
-          </select>
-          <span class="hint">ใช้กำหนด deadline การเคลม</span>
-        </div>
-
-        <!-- Month -->
-        <div class="field">
-          <label for="cal-month">เดือนที่เกิด Outage</label>
-          <select id="cal-month">
-            <option value="31">มกราคม (31 วัน)</option>
-            <option value="28">กุมภาพันธ์ (28 วัน)</option>
-            <option value="29">กุมภาพันธ์ — ปีอธิกสุรทิน (29 วัน)</option>
-            <option value="31">มีนาคม (31 วัน)</option>
-            <option value="30">เมษายน (30 วัน)</option>
-            <option value="31">พฤษภาคม (31 วัน)</option>
-            <option value="30">มิถุนายน (30 วัน)</option>
-            <option value="31">กรกฎาคม (31 วัน)</option>
-            <option value="31">สิงหาคม (31 วัน)</option>
-            <option value="30">กันยายน (30 วัน)</option>
-            <option value="31">ตุลาคม (31 วัน)</option>
-            <option value="30">พฤศจิกายน (30 วัน)</option>
-            <option value="31">ธันวาคม (31 วัน)</option>
-          </select>
-          <span class="hint">ใช้คำนวณ Total Billable Minutes</span>
-        </div>
-
-        <!-- Downtime -->
-        <div class="field">
-          <label>เวลา Downtime จริง (ที่ Microsoft ยืนยัน)</label>
-          <div class="downtime-row">
-            <input type="number" id="cal-dt-h" min="0" max="744" placeholder="0" value="0" />
-            <span>ชั่วโมง</span>
-            <input type="number" id="cal-dt-m" min="0" max="59" placeholder="0" value="0" />
-            <span>นาที</span>
+    <div class="grid-2">
+      <!-- Azure -->
+      <div class="card blue-top">
+        <h3>&#9729;&#65039; Microsoft Azure</h3>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">Sign in ที่ <strong>Azure Portal</strong> ด้วย account ที่ได้รับผลกระทบ</div>
           </div>
-          <span class="hint">ดูจาก Post Incident Review (PIR) ใน Service Health Dashboard</span>
-        </div>
-
-        <!-- Planned Maintenance exclusion -->
-        <div class="field">
-          <label>หักเวลา Planned Maintenance (ถ้ามี)</label>
-          <div class="downtime-row">
-            <input type="number" id="cal-maint-h" min="0" max="24" placeholder="0" value="0" />
-            <span>ชั่วโมง</span>
-            <input type="number" id="cal-maint-m" min="0" max="59" placeholder="0" value="0" />
-            <span>นาที</span>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">ไปที่ <strong>Help + Support → New Support Request</strong></div>
           </div>
-          <span class="hint">ช่วงที่ Microsoft แจ้งล่วงหน้า — ไม่นับใน SLA</span>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">เลือก <strong>Issue type: Billing</strong> → Problem type: <strong>Refund Request</strong></div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">ระบุว่าขอ SLA credit พร้อม <strong>วันที่/เวลา/timezone</strong> และ impacted services</div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">ตรวจสอบ contact details → <strong>Create</strong></div>
+          </div>
         </div>
-
-        <!-- Monthly cost -->
-        <div class="field field-full">
-          <label for="cal-cost">ค่าบริการรายเดือน (USD) — สำหรับคำนวณวงเงิน Credit</label>
-          <input type="number" id="cal-cost" min="0" placeholder="เช่น 1500" value="" />
-          <span class="hint">ใส่ 0 หรือเว้นว่างถ้าไม่ต้องการคำนวณวงเงิน</span>
-        </div>
-
       </div>
 
-      <button class="btn-calc" onclick="calcSLA()">&#9654;&#65039; คำนวณ SLA</button>
-      <button class="btn-reset" onclick="resetCalc()">&#8635; รีเซ็ต</button>
-
-      <!-- RESULT -->
-      <div id="calc-result">
-
-        <div class="result-hero">
-          <div>
-            <div id="res-pct" class="result-pct ok">99.99%</div>
-            <div style="font-size:.8rem;color:var(--ms-gray);text-align:center;margin-top:.2rem">Monthly Uptime</div>
+      <!-- M365 / O365 — CSP Partner (detailed) -->
+      <div class="card green-top">
+        <h3>&#128188; Microsoft 365 / Dynamics 365 / Intune — CSP Partner</h3>
+        <p style="font-size:.86rem;color:var(--text-muted);margin-bottom:.4rem">
+          เส้นทางละเอียดจาก <strong>Partner Center</strong> (10 ขั้น) — ใช้เมื่อ Partner ยื่น Service Credit Request แทนลูกค้า
+          CSP Direct/Indirect Provider เท่านั้น (Indirect Reseller ยื่นเองไม่ได้)
+        </p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">
+              <strong>ยืนยัน Role และ GDAP</strong>
+              ผู้ยื่นต้องมี <code>Admin agent</code> role ใน Partner Center และ <strong>GDAP relationship</strong>
+              ที่ active กับ tenant ลูกค้าโดยมี role <code>Service support administrator</code> เป็นอย่างน้อย
+              (มี permission <code>Microsoft.office365.supportTickets/allEntities/allTasks</code>)
+            </div>
           </div>
-          <div id="res-verdict" class="result-verdict ok">SLA ผ่าน</div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">
+              <strong>ตรวจ Service Health ของลูกค้า</strong>
+              Sign in <a href="https://partner.microsoft.com/dashboard" target="_blank" rel="noopener">partner.microsoft.com/dashboard</a>
+              → Customers → เลือก customer → <strong>Service management</strong> → ดู <em>Service health</em>
+              เพื่อยืนยัน Incident ID และ status (ต้องไม่ใช่ Advisory อย่างเดียว)
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">
+              <strong>เปิดเส้นทางสร้าง Service Request</strong>
+              มี 2 วิธี:<br>
+              (ก) <em>Customer List</em> → เลือกลูกค้า → <strong>Service request → New Request</strong><br>
+              (ข) เมนู <em>CSP → Administer</em> → <strong>Service Requests → New request</strong>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">
+              <strong>เลือก workload ที่ได้รับผลกระทบ</strong>
+              เช่น <em>Exchange Online, SharePoint Online, Microsoft Teams, Dynamics 365, Intune, EMS</em>
+              — Partner Center จะเปิด <strong>workload portal</strong> (เช่น M365 Admin Center) ใน
+              <em>context ของ partner สำหรับ tenant ลูกค้า</em>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">
+              <strong>ลิงก์ Support Plan (ถ้าจำเป็น)</strong>
+              สำหรับบางบริการให้ผูก support contract/entitlement
+              <em>หมายเหตุ:</em> M365 Admin Center <strong>ไม่</strong>รองรับการผูก support plan ด้วย Access ID/Contract ID
+              (ใช้สิทธิ์ CSP program entitlement โดยอัตโนมัติ)
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">
+              <strong>เลือก Support Category: SLA Credit</strong>
+              ใน workload portal เลือกหมวดสำหรับ billing / credit (เช่น
+              <em>Billing → Cancel, Credit or suspend subscriptions</em> หรือ equivalent)
+              หรือข้ามไปยัง <a href="https://partner.microsoft.com/dashboard/support/servicerequests/create?stage=2&amp;topicid=c65fe2c7-105c-aafc-2f8c-3d3acecb2e4a" target="_blank" rel="noopener">Partner Center Create Request (non-Azure)</a>
+              โดยตรงก็ได้
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">
+              <strong>กรอกฟอร์ม Ticket</strong>
+              Title ชัดเจน เช่น <code>SLA Service Credit Request — EX25194 — Exchange Online</code>
+              Description ระบุ: Tenant GUID, Incident ID, Impact window (UTC + timezone), จำนวน users ที่กระทบ,
+              อาการและ error, และสิ่งที่พิสูจน์ว่าเป็น Microsoft infrastructure (ไม่ใช่ customer/third-party)
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">
+              <strong>แนบหลักฐาน 2 ชุด</strong>
+              <em>Required:</em> Tenant GUID, Incident ID, CSP flag (Yes), อีเมลจากลูกค้าในโดเมน tenant ที่ขอ credit<br>
+              <em>Evidence of impact:</em> Service Health screenshot / PIR, error logs + request IDs, retry logs,
+              troubleshooting ที่ทำ, support contact log
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">
+              <strong>Contact: ใช้ข้อมูลของ Partner</strong>
+              ใน Contact information ต้องใส่ชื่อ/อีเมลของ <strong>Partner</strong> เท่านั้น
+              <em>ห้าม</em>ใส่ของลูกค้า (เพื่อให้ Microsoft ตอบกลับผ่าน Partner) → กด <strong>Submit</strong>
+              → รับ <em>Case/Ticket Number</em> เก็บไว้
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num"></div>
+            <div class="step-body">
+              <strong>ติดตามและรับ Credit</strong>
+              ดูสถานะที่ Partner Center → <em>Service requests</em> หรือ
+              <a href="https://admin.microsoft.com" target="_blank" rel="noopener">M365 Admin Center</a>
+              → Support → <em>See all support tickets</em>
+              หลังอนุมัติ Credit จะปรากฏใน <strong>Partner Invoice + Reconciliation File</strong>
+              (Partner Center → Billing → Invoices &amp; reconciliation) ให้ Partner ออก Credit Note ให้ลูกค้าต่อ
+            </div>
+          </div>
         </div>
 
-        <!-- Gauge -->
-        <div class="gauge-wrap">
-          <div class="gauge-track">
-            <div id="res-gauge" class="gauge-fill" style="width:100%;background:var(--ms-green)"></div>
-          </div>
-          <div class="gauge-labels">
-            <span>99%</span>
-            <span>99.9%</span>
-            <span>99.99%</span>
-            <span>100%</span>
+        <div class="alert warn" style="margin-top:.9rem">
+          <span class="icon">&#9888;&#65039;</span>
+          <div style="font-size:.88rem">
+            <strong>ข้อควรระวัง:</strong>
+            CSP Partners <em>ไม่</em>สามารถสร้าง support request แทน partner อื่น ๆ ได้ (อาจทำให้ ticket ล่าช้า)
+            และหากซื้อผ่าน <strong>Indirect Reseller</strong> ต้องส่งต่อให้ <strong>Indirect Provider</strong> เป็นผู้ยื่นใน Partner Center
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- Stats row -->
-        <div class="result-stats">
-          <div class="stat-box">
-            <div class="stat-val" id="res-total-min">—</div>
-            <div class="stat-lbl">Total Billable Minutes</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-val" id="res-down-min">—</div>
-            <div class="stat-lbl">Downtime Minutes (หลังหัก)</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-val" id="res-down-fmt">—</div>
-            <div class="stat-lbl">ระยะเวลา Downtime</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-val" id="res-allowed">—</div>
-            <div class="stat-lbl">Downtime ที่ยังอยู่ใน SLA 99.9%</div>
+    <div class="card yellow-top" style="margin-top:.5rem">
+      <h3>&#128204; CSP Partner: ขอ Credit ผ่าน Partner Center (ฉบับละเอียด)</h3>
+
+      <p style="margin-bottom:.8rem;color:var(--text-muted);font-size:.93rem">
+        CSP Partner ยื่นขอ SLA Service Credit แทนลูกค้าผ่าน <strong>Partner Center</strong> ได้ทั้งบริการใน
+        <em>legacy commerce experience</em> และ <em>new commerce experience (NCE)</em>
+        นโยบายใช้ร่วมกัน แต่เส้นทางเปิด Ticket และบทบาท (role) ที่ต้องใช้แตกต่างกันตามประเภทบริการ
+      </p>
+
+      <!-- Who can request -->
+      <div class="alert warn" style="margin-bottom:1rem">
+        <span class="icon">&#9888;&#65039;</span>
+        <div>
+          <strong>ใครยื่นได้ / ยื่นไม่ได้</strong><br>
+          &#9989; <strong>CSP Direct Provider</strong> และ <strong>CSP Indirect Provider</strong> (เจ้าของ subscription ที่ bill ลูกค้า)<br>
+          &#10060; <strong>Indirect Reseller</strong> ยื่นเองไม่ได้ ต้องให้ Indirect Provider เป็นผู้ยื่น<br>
+          &#10060; ลูกค้าไม่สามารถยื่น Credit ให้ตัวเองผ่าน Partner Center ได้ (ยื่นผ่าน portal ของบริการที่ตนซื้อโดยตรงเท่านั้น)
+        </div>
+      </div>
+
+      <!-- Prerequisites -->
+      <h3 style="margin-top:.6rem">&#128274; Prerequisites — สิ่งที่ต้องมีก่อนเปิด Ticket</h3>
+      <ul class="checklist">
+        <li><span class="cb"></span><div>บัญชีของคุณต้องมี <strong>Admin agent role</strong> ใน Partner Center</div></li>
+        <li><span class="cb"></span><div>มี <strong>GDAP relationship ที่ active</strong> กับ tenant ลูกค้า (เช่น <code>Service support administrator</code> หรือ role ที่น้อยที่สุดตาม GDAP guidance)</div></li>
+        <li><span class="cb"></span><div>สำหรับ <strong>Azure</strong>: ต้องเป็นผู้ให้บริการ Azure Subscription (CSP Direct/Indirect Provider) + มี <strong>RBAC</strong> บน subscription นั้น</div></li>
+        <li><span class="cb"></span><div>มี <strong>email ของลูกค้า</strong> ที่ส่งจาก domain ของ tenant ที่ได้รับผลกระทบจริง (ไม่รับ personal email)</div></li>
+        <li><span class="cb"></span><div>ยืนยันว่า Incident ไม่ใช่ <strong>Advisory</strong> เพียงอย่างเดียว (Advisory incidents โดยปกติ <em>ไม่มีสิทธิ์</em>ขอ Credit)</div></li>
+      </ul>
+
+      <!-- Routing table -->
+      <h3>&#128230; เลือกเส้นทาง Ticket ให้ถูกต้อง</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>บริการที่ได้รับผลกระทบ</th>
+              <th>เส้นทางที่ถูกต้อง</th>
+              <th>Topic / Category</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Microsoft 365 / Office 365 / Dynamics 365 / Intune / EMS</strong></td>
+              <td>Partner Center → Help + support → New request</td>
+              <td><span class="tag tag-blue">Cancel, Credit or suspend (non-Azure) subscriptions</span></td>
+            </tr>
+            <tr>
+              <td><strong>Microsoft Azure</strong></td>
+              <td>Partner Center → Administer customer → New support request (เปิดใน Azure Portal context ของ partner)</td>
+              <td><span class="tag tag-blue">Issue type: Billing → Problem type: Refund Request</span></td>
+            </tr>
+            <tr>
+              <td><strong>Legacy subscription ที่เลิกสนับสนุน</strong></td>
+              <td>Partner Center Support Ticket (commercial)</td>
+              <td><span class="tag tag-orange">Billing &amp; subscription management</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Step-by-step detailed -->
+      <h3>&#9881;&#65039; ขั้นตอนโดยละเอียด (8 ขั้น)</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-body">
+            <strong>ยืนยันสิทธิ์และ GDAP</strong>
+            Sign in <a href="https://partner.microsoft.com/dashboard" target="_blank" rel="noopener">partner.microsoft.com/dashboard</a>
+            ตรวจ role (Admin agent) และสถานะ GDAP กับลูกค้า หาก GDAP หมดอายุต้องขอใหม่ก่อน
           </div>
         </div>
-
-        <!-- Credit box -->
-        <div id="res-credit-box" class="credit-box none">
-          <div id="res-credit-pct" class="credit-pct">ไม่ได้ Credit</div>
-          <div id="res-credit-amt" class="credit-amt"></div>
-          <div id="res-credit-note" class="credit-note"></div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-body">
+            <strong>ยืนยัน Incident ID และขอบเขต</strong>
+            ตรวจ Service Health Dashboard ของลูกค้า → บันทึก <code>Incident ID</code> (เช่น <code>EX25194</code>) และระบุว่าได้รับผลกระทบ <em>จริง</em> (ไม่ใช่ Advisory)
+            และรอ Post Incident Review (PIR) หากยังไม่ปิด
+          </div>
         </div>
-
-        <!-- Deadline reminder -->
-        <div id="res-deadline" class="deadline-box">
-          <span>&#128197;</span>
-          <span id="res-deadline-text"></span>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-body">
+            <strong>รวบรวมหลักฐานตาม 2 ชุดด้านล่าง</strong>
+            ทั้งชุด <em>Required information</em> และชุด <em>Evidence that proves customer impact</em> ต้องครบก่อนเปิด ticket เพื่อลด back-and-forth
+          </div>
         </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-body">
+            <strong>เปิด Ticket สำหรับ non-Azure</strong>
+            ไปที่ <a href="https://partner.microsoft.com/dashboard/support/servicerequests/create?stage=2&amp;topicid=c65fe2c7-105c-aafc-2f8c-3d3acecb2e4a" target="_blank" rel="noopener">Partner Center → Help + support → Create request</a>
+            → เลือก topic <strong>“Cancel, Credit or suspend (non-Azure) subscriptions”</strong>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-body">
+            <strong>เปิด Ticket สำหรับ Azure</strong>
+            ไปที่ Partner Center → เลือก Customer → <strong>Service management → Administer services</strong> → เปิด Azure portal ใน context ลูกค้า
+            → <strong>Help + Support → New Support Request</strong> → Issue type: <strong>Billing</strong>, Problem type: <strong>Refund Request</strong>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-body">
+            <strong>กรอก Contact ด้วยข้อมูล Partner</strong>
+            ใส่ชื่อ/อีเมลของ <em>Partner</em> เป็นผู้ติดต่อหลัก <strong>ไม่ใช่</strong>ลูกค้า
+            และเลือก Support Plan ที่เหมาะสม (MAICPP Partner Cloud Support หรือ paid support)
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-body">
+            <strong>แนบหลักฐานและส่ง</strong>
+            Upload: PIR / Service Health screenshot, error logs, retry logs, email จาก tenant ลูกค้า, และ Support Ticket number เดิม (ถ้ามี)
+            → Submit
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-body">
+            <strong>ติดตามและ reconcile</strong>
+            ติดตามสถานะที่ Partner Center → <strong>Service requests</strong>
+            หลังอนุมัติ Credit จะปรากฏใน <strong>invoice และ reconciliation file</strong> รอบถัดไป ดูใน Billing → Reconciliation
+          </div>
+        </div>
+      </div>
 
-        <!-- Show formula used -->
-        <div class="calc-box" style="margin-top:1rem;font-size:.85rem" id="res-formula-box"></div>
+      <!-- Required vs Evidence -->
+      <h3>&#128196; เอกสาร 2 ชุดที่ต้องแนบ</h3>
+      <div class="grid-2">
+        <div class="card blue-top" style="margin:0">
+          <strong style="color:var(--ms-blue)">ชุดที่ 1 — Required Information</strong>
+          <p style="font-size:.85rem;color:var(--text-muted);margin:.3rem 0 .6rem">ข้อมูลพื้นฐานที่ Microsoft กำหนดให้ระบุในทุก credit request</p>
+          <ul class="checklist">
+            <li><span class="cb"></span><div><strong>Customer Tenant GUID</strong></div></li>
+            <li><span class="cb"></span><div><strong>Outage Incident Identifier</strong> (เช่น <code>EX25194</code>)</div></li>
+            <li><span class="cb"></span><div>หลักฐานว่าลูกค้า <strong>ได้รับผลกระทบ</strong> และ <strong>ขอ Credit</strong></div></li>
+            <li><span class="cb"></span><div>ระบุว่า subscription <strong>ซื้อผ่าน CSP หรือไม่</strong> (Yes/No)</div></li>
+          </ul>
+        </div>
+        <div class="card green-top" style="margin:0">
+          <strong style="color:var(--ms-green)">ชุดที่ 2 — Evidence of Customer Impact</strong>
+          <p style="font-size:.85rem;color:var(--text-muted);margin:.3rem 0 .6rem">หลักฐานเชิงเทคนิค/ธุรกิจที่พิสูจน์ผลกระทบจริง</p>
+          <ul class="checklist">
+            <li><span class="cb"></span><div><strong>Time &amp; duration</strong> ของ downtime พร้อม timezone</div></li>
+            <li><span class="cb"></span><div><strong>จำนวนและที่ตั้ง</strong> ของ users ที่ได้รับผลกระทบ</div></li>
+            <li><span class="cb"></span><div><strong>Troubleshooting</strong> ที่ทำระหว่างเกิดเหตุ (retry, failover, workaround)</div></li>
+            <li><span class="cb"></span><div><strong>Email จากลูกค้า</strong> จาก domain ของ tenant ที่ได้รับผลกระทบ (ขอ support + credit)</div></li>
+            <li><span class="cb"></span><div><strong>Support ticket number</strong> และบันทึก contact กับลูกค้า</div></li>
+          </ul>
+        </div>
+      </div>
 
+      <!-- Not sufficient -->
+      <div class="alert danger" style="margin-top:1rem">
+        <span class="icon">&#10060;</span>
+        <div>
+          <strong>ข้อมูลต่อไปนี้ “ไม่เพียงพอ” สำหรับการ process:</strong><br>
+          ชื่อลูกค้า + Tenant ID + Partner Ticket Number + Ticket created timestamp <em>เพียงเท่านี้</em>
+          Microsoft จะ reject หรือทวงหลักฐานเพิ่ม ทำให้ ticket ค้างนานและอาจเลย deadline
+        </div>
+      </div>
+
+      <!-- Deadlines emphasised -->
+      <div class="alert warn" style="margin-top:.8rem">
+        <span class="icon">&#9201;&#65039;</span>
+        <div>
+          <strong>Deadline สำคัญ (เริ่มนับจากสิ้นสุด billing month ที่เกิด Incident):</strong><br>
+          &#8226; <strong>Microsoft Azure</strong> — ภายใน <strong>2 เดือน</strong><br>
+          &#8226; <strong>M365 / Dynamics 365 / Intune / บริการอื่น</strong> — ภายใน <strong>1 เดือน</strong><br>
+          นโยบายนี้ใช้กับทั้ง legacy commerce และ new commerce experience (NCE)
+        </div>
+      </div>
+
+      <!-- After approval -->
+      <div class="alert ok" style="margin-top:.8rem">
+        <span class="icon">&#128176;</span>
+        <div>
+          <strong>หลังได้รับอนุมัติ:</strong> Credit จะถูก prorate ตามบริการที่กระทบและ duration ของ outage
+          แล้วปรากฏใน <strong>invoice ถัดไป</strong> และ <strong>Reconciliation File</strong> ที่ Partner Center →
+          <em>Billing → Invoices &amp; reconciliation</em> ใช้ไฟล์นี้ map กลับไปยัง customer/subscription เพื่อออก credit note ให้ลูกค้าปลายทาง
+        </div>
+      </div>
+
+      <!-- Quick links -->
+      <h3>&#128279; Quick Links</h3>
+      <a class="source-link" href="https://partner.microsoft.com/dashboard/support/servicerequests/create?stage=2&amp;topicid=c65fe2c7-105c-aafc-2f8c-3d3acecb2e4a" target="_blank" rel="noopener">
+        <span class="src-icon">&#128221;</span>
+        <span>
+          <strong>Partner Center — สร้าง Credit Request (non-Azure) โดยตรง</strong>
+          <span class="src-url">partner.microsoft.com/dashboard/support/servicerequests/create</span>
+        </span>
+      </a>
+      <a class="source-link" href="https://learn.microsoft.com/partner-center/billing/request-credit" target="_blank" rel="noopener">
+        <span class="src-icon">&#128214;</span>
+        <span>
+          <strong>How and When to Request a Credit from Microsoft — Partner Center Docs</strong>
+          <span class="src-url">learn.microsoft.com/partner-center/billing/request-credit</span>
+        </span>
+      </a>
+      <a class="source-link" href="https://learn.microsoft.com/partner-center/customers/report-problems-on-behalf-of-a-customer" target="_blank" rel="noopener">
+        <span class="src-icon">&#128101;</span>
+        <span>
+          <strong>Report a Service Problem on Behalf of a Customer</strong>
+          <span class="src-url">learn.microsoft.com/partner-center/customers/report-problems-on-behalf-of-a-customer</span>
+        </span>
+      </a>
+      <a class="source-link" href="https://learn.microsoft.com/partner-center/gdap-least-privileged-roles-by-task" target="_blank" rel="noopener">
+        <span class="src-icon">&#128273;</span>
+        <span>
+          <strong>GDAP Least Privileged Roles by Task</strong>
+          <span class="src-url">learn.microsoft.com/partner-center/gdap-least-privileged-roles-by-task</span>
+        </span>
+      </a>
+    </div>
+
+    <div class="alert ok">
+      <span class="icon">&#9989;</span>
+      <div>
+        <strong>Credit จะครอบคลุมเฉพาะ service ที่ได้รับผลกระทบจริง:</strong>
+        เช่น ถ้า M365 Suite เจอปัญหาแค่ SharePoint — credit จะได้เฉพาะ SharePoint
+        ไม่ใช่ทั้ง suite และ <em>credit ไม่ครอบคลุม lost revenue หรือ reputational damage</em>
       </div>
     </div>
   </section>
