@@ -801,9 +801,11 @@
   <a href="#overview" class="active">ภาพรวม SLA</a>
   <a href="#october-sla">&#128197; SLA ตุลาคม</a>
   <a href="#detect">ตรวจจับ Outage</a>
+  <a href="#health-types">&#128737;&#65039; ประเภทใน Service Health</a>
   <a href="#evaluate">ประเมิน SLA</a>
   <a href="#evidence">รวบรวมหลักฐาน</a>
   <a href="#claim">ขอเคลม</a>
+  <a href="#workflow-request">&#128230; Workflow: Direct/CSP/EA</a>
   <a href="#deadline">กำหนดเวลา</a>
   <a href="#calculator">&#129518; คำนวณ SLA</a>
   <a href="#ticket-template">&#128221; สร้าง Ticket</a>
@@ -991,7 +993,217 @@
       <div>
         <strong>Advisory Incidents ≠ SLA Credit:</strong>
         Incident ที่ระบุว่า "Advisory" (อาจได้รับผลกระทบ) โดยปกติ <strong>ไม่มีสิทธิ์</strong>ขอ SLA Credit
-        ต้องเป็น Incident ที่ระบุว่า tenant ของคุณ <em>ได้รับผลกระทบจริง</em>
+        ต้องเป็น Incident ที่ระบุว่า tenant ของคุณ <em>ได้รับผลกระทบจริง</em> ดูรายละเอียดประเภทใน section ถัดไป
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== HEALTH TYPES ====== -->
+  <section id="health-types">
+    <h2>&#128737;&#65039; ประเภทที่ Service Health แสดง — แบบไหนเคลม SLA ได้</h2>
+
+    <div class="alert info">
+      <span class="icon">&#8505;&#65039;</span>
+      <div>
+        ไม่ใช่ทุกข้อความใน Service Health จะเคลม SLA Credit ได้ ก่อนยื่นต้องแยกให้ออกว่า event นั้นเป็น
+        <strong>ประเภทใด</strong> (type), <strong>มาจากไหน</strong> (origin), และอยู่ใน
+        <strong>สถานะใด</strong> (status) ตารางด้านล่างสรุปตามเอกสาร Microsoft Learn
+      </div>
+    </div>
+
+    <!-- M365 types -->
+    <h3>&#128230; Microsoft 365 / Dynamics 365 / Intune Admin Center</h3>
+    <div class="grid-2">
+      <div class="card red-top" style="margin:0">
+        <strong style="color:var(--ms-red)">&#10071;&#65039; Incident</strong>
+        <p style="font-size:.9rem;margin-top:.4rem">
+          บริการหรือฟังก์ชันหลัก <strong>ใช้งานไม่ได้</strong> มีผลกระทบต่อผู้ใช้อย่างชัดเจน (ส่งอีเมลไม่ได้, Sign-in ไม่ได้)
+          Microsoft จะโพสต์อัปเดตต่อเนื่อง และออก PIR หลังปิดเหตุการณ์
+        </p>
+        <p style="margin-top:.5rem"><span class="tag tag-green">เข้าเกณฑ์เคลม SLA ได้</span> (หาก tenant กระทบและ uptime ต่ำกว่า commitment)</p>
+      </div>
+      <div class="card yellow-top" style="margin:0">
+        <strong style="color:var(--ms-orange)">&#9888;&#65039; Advisory</strong>
+        <p style="font-size:.9rem;margin-top:.4rem">
+          รับรู้ปัญหาแต่บริการ <strong>ยังใช้งานได้</strong> — มักเป็น intermittent, ขอบเขตจำกัด หรือมี workaround
+        </p>
+        <p style="margin-top:.5rem"><span class="tag tag-orange">ปกติ “ไม่” เข้าเกณฑ์</span> — ยื่นได้เฉพาะเมื่อพิสูจน์ user impact จริงพร้อมหลักฐานเชิงปริมาณ</p>
+      </div>
+    </div>
+
+    <!-- Issue origin -->
+    <h3>&#127758; Issue Origin — ต้นตอของปัญหา</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Issue Origin</th><th>คำอธิบาย</th><th>เคลม SLA ได้?</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Microsoft Infrastructure</strong></td>
+            <td>ปัญหาเกิดใน cloud infrastructure ของ Microsoft เอง (เช่น Exchange, M365 backend)</td>
+            <td><span class="tag tag-green">&#9989; ใช่ (ถ้าเป็น Incident + ต่ำกว่า SLA)</span></td>
+          </tr>
+          <tr>
+            <td><strong>Third-party Infrastructure</strong></td>
+            <td>ปัญหาเกิดจาก third-party ที่องค์กร depend (เช่น STS provider ภายนอก throttle)</td>
+            <td><span class="tag tag-red">&#10060; ไม่ได้ — อยู่นอก Microsoft scope</span></td>
+          </tr>
+          <tr>
+            <td><strong>Customer Infrastructure / "Your org"</strong></td>
+            <td>ปัญหาเกิดในระบบของลูกค้าเอง (เช่น certificate หมดอายุ, STS ของลูกค้า)</td>
+            <td><span class="tag tag-red">&#10060; ไม่ได้ — ลูกค้าต้องแก้เอง</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- M365 statuses -->
+    <h3>&#128260; Status ของ Incident/Advisory และผลต่อการเคลม</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Status</th><th>ความหมาย</th><th>ใช้ประกอบการเคลมได้?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Investigating</strong></td><td>Microsoft กำลังรวบรวมข้อมูลเกี่ยวกับปัญหาและขอบเขต</td><td><span class="tag tag-blue">บันทึก timestamp</span></td></tr>
+          <tr><td><strong>Service degradation</strong></td><td>ยืนยันแล้วว่าบริการช้าหรือมี feature ไม่ทำงาน</td><td><span class="tag tag-green">&#9989; ใช่</span></td></tr>
+          <tr><td><strong>Service interruption</strong></td><td>ผู้ใช้เข้าใช้งานไม่ได้ กระทบชัดเจน consistent</td><td><span class="tag tag-green">&#9989; ใช่</span></td></tr>
+          <tr><td><strong>Restoring service</strong></td><td>พบสาเหตุและกำลังกู้คืนบริการ</td><td><span class="tag tag-green">&#9989; ยังอยู่ในช่วง downtime</span></td></tr>
+          <tr><td><strong>Extended recovery</strong></td><td>กำลังกู้คืนให้ผู้ใช้ส่วนใหญ่ แต่ยังเหลือบางส่วน</td><td><span class="tag tag-green">&#9989; ใช่</span></td></tr>
+          <tr><td><strong>Investigation suspended</strong></td><td>Microsoft ขอข้อมูลเพิ่มจากลูกค้าเพื่อสอบสวนต่อ</td><td><span class="tag tag-orange">&#9888;&#65039; รอข้อมูล</span></td></tr>
+          <tr><td><strong>Service restored</strong></td><td>ยืนยันว่าแก้ไขเสร็จแล้ว</td><td><span class="tag tag-green">&#9989; ใช้เป็นหลักฐานปิด incident</span></td></tr>
+          <tr><td><strong>False positive</strong></td><td>สอบสวนแล้วพบว่าบริการปกติ ไม่มีผลกระทบจริง</td><td><span class="tag tag-red">&#10060; ไม่ได้</span></td></tr>
+          <tr><td><strong>Post-incident report published</strong></td><td>PIR ออกแล้ว ระบุ root cause และ affected tenants</td><td><span class="tag tag-green">&#9989; หลักฐานสำคัญที่สุด</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert warn">
+      <span class="icon">&#128188;</span>
+      <div>
+        <strong>Planned Maintenance ไม่แสดงใน Service Health</strong><br>
+        สำหรับ M365 การบำรุงรักษาที่นัดหมายล่วงหน้าจะอยู่ใน <strong>Message Center</strong> ภายใต้หมวด <em>“Plan for change”</em>
+        ช่วงเวลานี้ <strong>ไม่</strong>นับเป็น downtime ตาม SLA — เมื่อคำนวณให้หักออกจาก Raw Downtime
+      </div>
+    </div>
+
+    <!-- Azure types -->
+    <h3>&#9729;&#65039; Azure Service Health — 5 ประเภท Event</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Event Type</th>
+            <th>เนื้อหา</th>
+            <th>Severity / Tags</th>
+            <th>เคลม SLA ได้?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Service issues</strong></td>
+            <td>Outage หรือ degradation ที่กระทบ resource ของคุณตอนนี้ — unplanned</td>
+            <td>Error (widespread) / Warning (specific) / Informational (management ops) + tags: Action recommended, Preliminary PIR, Final PIR, False positive</td>
+            <td><span class="tag tag-green">&#9989; ใช่ (Error/Warning)</span></td>
+          </tr>
+          <tr>
+            <td><strong>Planned maintenance</strong></td>
+            <td>การบำรุงรักษาที่นัดล่วงหน้า อาจมี brief downtime</td>
+            <td>Warning (emergency) / Informational (standard)</td>
+            <td><span class="tag tag-red">&#10060; ไม่ — SLA ยกเว้น</span></td>
+          </tr>
+          <tr>
+            <td><strong>Health advisories</strong></td>
+            <td>การเปลี่ยนแปลงที่ต้องให้ความสนใจ เช่น feature deprecation, retirement, upgrade requirement</td>
+            <td>Warning (prompt action) / Informational</td>
+            <td><span class="tag tag-red">&#10060; ไม่ — เป็นคำแนะนำ</span></td>
+          </tr>
+          <tr>
+            <td><strong>Security advisories</strong></td>
+            <td>การแจ้งเตือนด้าน security ที่อาจกระทบ availability</td>
+            <td>Warning / Informational</td>
+            <td><span class="tag tag-red">&#10060; ไม่ — การแจ้งเตือน</span></td>
+          </tr>
+          <tr>
+            <td><strong>Billing updates</strong></td>
+            <td>การสื่อสารเกี่ยวกับ subscription/billing</td>
+            <td>Informational</td>
+            <td><span class="tag tag-red">&#10060; ไม่เกี่ยวกับ SLA</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert info" style="margin-top:1rem">
+      <span class="icon">&#128270;</span>
+      <div>
+        <strong>ดูประเภทจาก Azure Resource Graph:</strong>
+        ในตาราง <code>ServiceHealthResources</code> field <code>properties.EventType</code> จะแสดงค่าเช่น
+        <code>ServiceIssue</code>, <code>PlannedMaintenance</code>, <code>HealthAdvisory</code>, <code>SecurityAdvisory</code>
+        และ <code>properties.Status</code> จะเป็น <code>Active</code> หรือ <code>Resolved</code>
+        ช่วยยืนยันประเภทก่อนยื่นเคลม
+      </div>
+    </div>
+
+    <!-- Summary decision -->
+    <h3>&#9989; สรุปตารางตัดสินใจ — Event นี้ยื่นเคลมได้ไหม?</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>สัญญาณที่พบ</th><th>ผลประเมิน</th><th>เหตุผล</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>M365 <strong>Incident</strong> + Issue origin = Microsoft + Status = Service interruption/degradation</td>
+            <td><span class="tag tag-green">&#9989; เคลมได้ (ถ้า uptime &lt; SLA)</span></td>
+            <td>Core case — ตรงตามนิยาม Downtime</td>
+          </tr>
+          <tr>
+            <td>Azure <strong>Service issue</strong> severity Error หรือ Warning + Impact start/mitigation time ชัดเจน</td>
+            <td><span class="tag tag-green">&#9989; เคลมได้ (ถ้า uptime &lt; SLA)</span></td>
+            <td>มี timestamp ครบสำหรับคำนวณ Monthly Uptime %</td>
+          </tr>
+          <tr>
+            <td>M365 <strong>Advisory</strong> + ไม่มีหลักฐาน user impact</td>
+            <td><span class="tag tag-red">&#10060; ไม่ได้</span></td>
+            <td>Advisory ปกติไม่เข้าเกณฑ์ — ต้องพิสูจน์ impact ด้วย logs/retry</td>
+          </tr>
+          <tr>
+            <td>Issue origin = Customer หรือ Third-party</td>
+            <td><span class="tag tag-red">&#10060; ไม่ได้</span></td>
+            <td>SLA ยกเว้น customer-side และ third-party dependency</td>
+          </tr>
+          <tr>
+            <td>Azure <strong>Planned maintenance</strong></td>
+            <td><span class="tag tag-red">&#10060; ไม่ได้</span></td>
+            <td>SLA exclusion — ต้องหักออกจาก Downtime ถ้ามีการใช้ร่วม</td>
+          </tr>
+          <tr>
+            <td>Status = <strong>False positive</strong></td>
+            <td><span class="tag tag-red">&#10060; ไม่ได้</span></td>
+            <td>Microsoft ยืนยันว่าไม่ได้มี outage จริง</td>
+          </tr>
+          <tr>
+            <td>Azure <strong>Health/Security advisory</strong> หรือ <strong>Billing update</strong></td>
+            <td><span class="tag tag-red">&#10060; ไม่ได้</span></td>
+            <td>ไม่ใช่ outage; เป็นการแจ้งเตือนหรือเรื่อง billing</td>
+          </tr>
+          <tr>
+            <td><strong>Service issue</strong> ที่ยังไม่มี PIR และ Microsoft ขอข้อมูลเพิ่ม (Investigation suspended)</td>
+            <td><span class="tag tag-orange">&#9888;&#65039; รอ</span></td>
+            <td>รวบรวมหลักฐานส่งกลับ แล้วรอ status เปลี่ยนเป็น Service restored + PIR ก่อนยื่น</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert ok" style="margin-top:1rem">
+      <span class="icon">&#128218;</span>
+      <div>
+        <strong>Field ที่ควรบันทึกจาก Service Health ทุก event:</strong>
+        Tracking/Incident ID, Event Type, Issue Origin, Status, Impact start/mitigation time, Affected services &amp; regions, Scope (subscription/tenant), และลิงก์ไปยัง PIR (ถ้ามี)
+        ช่วยให้คำนวณ Net Downtime และยื่นเคลมได้รวดเร็ว
       </div>
     </div>
   </section>
@@ -1365,6 +1577,234 @@
         ไม่ใช่ทั้ง suite และ <em>credit ไม่ครอบคลุม lost revenue หรือ reputational damage</em>
       </div>
     </div>
+  </section>
+
+  <!-- ====== WORKFLOW REQUEST BY LICENSING MODEL ====== -->
+  <section id="workflow-request">
+    <h2>&#128230; Workflow Request — แยกตามประเภทสัญญา (Direct / CSP / EA)</h2>
+
+    <div class="alert info">
+      <span class="icon">&#8505;&#65039;</span>
+      <div>
+        วิธียื่น SLA Credit ขึ้นกับ <strong>Licensing Model</strong> ของ subscription ที่ได้รับผลกระทบ
+        โดยเส้นทาง portal, บทบาทผู้ยื่น, หลักฐาน และรูปแบบการได้รับเครดิตแตกต่างกัน ตรวจประเภทสัญญาก่อนเริ่มทุกครั้ง
+      </div>
+    </div>
+
+    <!-- Determine your licensing type -->
+    <h3>&#129504; ตรวจประเภทสัญญาก่อน</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>สัญญาณ</th><th>น่าจะเป็น</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ซื้อตรงจาก microsoft.com / admin.microsoft.com / portal.azure.com ด้วยบัตรเครดิต หรือ invoice จาก Microsoft โดยตรง</td><td><span class="tag tag-blue">Direct (Web Direct / MCA)</span></td></tr>
+          <tr><td>ซื้อผ่าน Partner ไทย/ต่างประเทศ ใบเสร็จออกโดย Partner มีคำว่า CSP / Cloud Solution Provider บน invoice</td><td><span class="tag tag-blue">CSP</span></td></tr>
+          <tr><td>มี <strong>Enrollment Number</strong> จาก Microsoft; เข้าใช้ EA portal (ea.azure.com เดิม) หรือ Billing scope เป็น Enterprise Agreement; มีสัญญา EA/EAS/SCE 3 ปี</td><td><span class="tag tag-blue">EA (Enterprise Agreement)</span></td></tr>
+          <tr><td>ไม่แน่ใจ: ตรวจที่ <strong>Azure Portal → Cost Management + Billing → Billing scopes</strong> ดู Account type</td><td><span class="tag tag-orange">ตรวจซ้ำก่อนยื่น</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3 columns -->
+    <div class="grid-2" style="margin-top:1rem">
+
+      <!-- DIRECT -->
+      <div class="card blue-top" style="margin:0">
+        <h3 style="margin-top:0">&#128187; Direct (Web Direct / MCA)</h3>
+        <p style="font-size:.88rem;color:var(--text-muted)">
+          ลูกค้าซื้อตรงจาก Microsoft ผ่าน portal ทั่วไป ใช้ Microsoft Customer Agreement (MCA) เป็นหลัก
+          ยื่นเองได้โดยไม่ต้องผ่าน partner
+        </p>
+
+        <h3>ผู้ยื่น</h3>
+        <ul class="checklist">
+          <li><span class="cb"></span><div><strong>Global Admin / Billing Admin</strong> ของ tenant</div></li>
+          <li><span class="cb"></span><div>หรือ <strong>Service Support Admin</strong> (M365)</div></li>
+          <li><span class="cb"></span><div>Azure: <strong>Billing account owner / contributor</strong></div></li>
+        </ul>
+
+        <h3>เส้นทาง</h3>
+        <div class="steps">
+          <div class="step"><div class="step-num"></div><div class="step-body"><strong>Azure</strong>: <a href="https://portal.azure.com" target="_blank" rel="noopener">portal.azure.com</a> → Help + Support → New support request → <em>Issue type: Billing</em> → <em>Problem type: Refund request</em> → ระบุ SLA credit + วัน/เวลา/service</div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body"><strong>M365/Dynamics</strong>: <a href="https://admin.microsoft.com" target="_blank" rel="noopener">admin.microsoft.com</a> → Support → New service request → Billing → ขอ SLA Service Credit</div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body">แนบ Incident ID, PIR, timestamps, impact evidence</div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body">ติดตามผ่าน portal เดียวกัน</div></div>
+        </div>
+
+        <h3>รูปแบบ Credit</h3>
+        <p style="font-size:.88rem">หักออกจาก <strong>invoice ถัดไป</strong> หรือสำหรับ MCA แสดงเป็น credit memo ใน Billing → Invoices</p>
+
+        <h3>Deadline</h3>
+        <p style="font-size:.88rem">Azure: 2 เดือน · M365/อื่น ๆ: 1 เดือน (นับจากสิ้น billing month)</p>
+      </div>
+
+      <!-- CSP -->
+      <div class="card yellow-top" style="margin:0">
+        <h3 style="margin-top:0">&#129309; CSP (Cloud Solution Provider)</h3>
+        <p style="font-size:.88rem;color:var(--text-muted)">
+          ลูกค้าซื้อผ่าน Partner — <strong>Partner เป็นผู้ยื่นแทนลูกค้า</strong>
+          (ลูกค้าปลายทางยื่นเองผ่าน Partner Center ไม่ได้)
+        </p>
+
+        <h3>ผู้ยื่น</h3>
+        <ul class="checklist">
+          <li><span class="cb"></span><div>CSP <strong>Direct Provider</strong> หรือ <strong>Indirect Provider</strong></div></li>
+          <li><span class="cb"></span><div>Role: <strong>Admin agent</strong> + <strong>GDAP</strong> relationship กับลูกค้า</div></li>
+          <li><span class="cb"></span><div>❌ <strong>Indirect Reseller</strong> ยื่นไม่ได้ ต้องส่งต่อให้ Indirect Provider</div></li>
+        </ul>
+
+        <h3>เส้นทาง</h3>
+        <div class="steps">
+          <div class="step"><div class="step-num"></div><div class="step-body"><strong>M365/Dynamics</strong>: <a href="https://partner.microsoft.com/dashboard" target="_blank" rel="noopener">Partner Center</a> → Help + support → Create request → <em>Cancel, Credit or suspend (non-Azure) subscriptions</em></div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body"><strong>Azure</strong>: Partner Center → Administer customer → Azure Portal (context ลูกค้า) → New support request → <em>Billing → Refund Request</em></div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body">แนบ Required Information + Evidence (ดู section CSP)</div></div>
+          <div class="step"><div class="step-num"></div><div class="step-body">Partner ออก credit note ให้ลูกค้าต่อหลังได้รับอนุมัติ</div></div>
+        </div>
+
+        <h3>รูปแบบ Credit</h3>
+        <p style="font-size:.88rem">ปรากฏใน <strong>invoice + Reconciliation file</strong> ที่ Partner Center → <em>Billing → Invoices &amp; reconciliation</em> → Partner ส่งต่อให้ลูกค้าเอง</p>
+
+        <h3>Deadline</h3>
+        <p style="font-size:.88rem">เหมือน Direct: Azure 2 เดือน · อื่น ๆ 1 เดือน ครอบคลุมทั้ง legacy และ NCE</p>
+      </div>
+    </div>
+
+    <!-- EA (full-width) -->
+    <div class="card red-top" style="margin-top:1rem">
+      <h3 style="margin-top:0">&#127970; EA — Enterprise Agreement (รวม EAS, SCE)</h3>
+      <p style="font-size:.88rem;color:var(--text-muted)">
+        ลูกค้าองค์กรขนาดใหญ่ที่เซ็นสัญญา EA 3 ปีกับ Microsoft (ซื้อผ่าน LSP/SSP partner หรือ EA Direct)
+        มี Enrollment Number และ Enterprise Administrator role ต่างจาก Direct/CSP เพราะ SLA credit จะใช้เป็น
+        <strong>credit สำหรับใช้งาน Azure ในอนาคต</strong> ไม่ใช่ cash refund และ <strong>หมดอายุเมื่อครบ enrollment anniversary term</strong>
+      </p>
+
+      <div class="grid-2">
+        <div>
+          <h3 style="margin-top:.4rem">ผู้ยื่น</h3>
+          <ul class="checklist">
+            <li><span class="cb"></span><div><strong>Enterprise Administrator</strong> (EA Direct)</div></li>
+            <li><span class="cb"></span><div><strong>Account Owner</strong> ของ subscription</div></li>
+            <li><span class="cb"></span><div><strong>EA Indirect</strong>: ติดต่อ <strong>Partner Administrator</strong> ของ LSP/SSP ที่เป็นตัวแทนของ enrollment — ลูกค้ายื่นเองไม่ได้</div></li>
+            <li><span class="cb"></span><div><strong>Microsoft Account Team / Account Manager</strong> สำหรับเคสที่ซับซ้อน</div></li>
+          </ul>
+
+          <h3>เส้นทาง — Technical SLA credit</h3>
+          <div class="steps">
+            <div class="step"><div class="step-num"></div><div class="step-body">เข้า <a href="https://portal.azure.com" target="_blank" rel="noopener">Azure Portal</a> ด้วย Enterprise Admin</div></div>
+            <div class="step"><div class="step-num"></div><div class="step-body">Help + Support → New support request → <em>Issue type: Billing</em> → <em>Problem type: Refund request</em></div></div>
+            <div class="step"><div class="step-num"></div><div class="step-body">ระบุ <strong>Enrollment Number</strong>, Incident ID, Impact window</div></div>
+            <div class="step"><div class="step-num"></div><div class="step-body"><strong>EA Indirect</strong>: แจ้ง LSP/SSP ให้ยื่นแทนผ่าน <strong>VL Central → My Cases &amp; Support</strong> หรือ Microsoft Account Team</div></div>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="margin-top:.4rem">รูปแบบ Credit ที่แตกต่าง</h3>
+          <ul class="checklist">
+            <li><span class="cb"></span><div><strong>Service Credit ≠ cash refund</strong> — เป็นเครดิตใช้กับ Azure consumption ในอนาคตเท่านั้น</div></li>
+            <li><span class="cb"></span><div>Expire เมื่อจบ <strong>enrollment anniversary term</strong> ปัจจุบัน (ใช้ไม่ทัน = หายไป)</div></li>
+            <li><span class="cb"></span><div>ปรากฏในรายงาน usage summary ด้วย <strong>Accounting Code <code>O21</code></strong> — <em>Service Level Agreement Credit</em></div></li>
+            <li><span class="cb"></span><div>ตรวจที่ Azure Portal → Cost Management + Billing → Billing scope (EA enrollment) → <strong>Usage + charges</strong></div></li>
+          </ul>
+
+          <h3>Deadline</h3>
+          <p style="font-size:.88rem">
+            Azure: ภายใน 2 เดือนจากสิ้น billing month · เตือนเป็นพิเศษให้ยื่นเร็ว เพื่อให้มีเวลาใช้ credit ก่อน anniversary term หมด
+          </p>
+
+          <h3>เครื่องมือเพิ่มเติม</h3>
+          <ul class="checklist">
+            <li><span class="cb"></span><div><strong>VL Central</strong> → <em>Credits and transfers</em> workspace (ใช้กับ licensing credits ไม่ใช่ SLA technical แต่สำคัญสำหรับ volume license ปัญหาอื่น)</div></li>
+            <li><span class="cb"></span><div><strong>VL Central → My Cases &amp; Support</strong> สำหรับ escalation</div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison table -->
+    <h3 style="margin-top:1.4rem">&#128202; เปรียบเทียบ 3 รูปแบบ</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>หัวข้อ</th>
+            <th>Direct</th>
+            <th>CSP</th>
+            <th>EA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>ผู้ยื่น</td><td>ลูกค้าโดยตรง (Admin)</td><td>Partner (Direct/Indirect Provider)</td><td>Enterprise Admin / Partner Admin (indirect)</td></tr>
+          <tr><td>Portal หลัก</td><td>Azure Portal / M365 Admin Center</td><td>Partner Center (+ Azure portal ผ่าน context)</td><td>Azure Portal (billing scope: EA) / VL Central</td></tr>
+          <tr><td>บทบาทที่ต้องใช้</td><td>Billing/Global/Service Support Admin</td><td>Admin agent + GDAP (+ RBAC สำหรับ Azure)</td><td>Enterprise Admin / Account Owner</td></tr>
+          <tr><td>Topic / Category</td><td>Billing → Refund request</td><td>Cancel, Credit or suspend (non-Azure)</td><td>Billing → Refund request + ระบุ Enrollment</td></tr>
+          <tr><td>รูปแบบเครดิต</td><td>หัก invoice ถัดไป</td><td>Invoice + Reconciliation; Partner ออกให้ลูกค้าต่อ</td><td><strong>Future Azure usage credit</strong> (Code O21), ไม่ใช่เงินสด</td></tr>
+          <tr><td>เครดิตหมดอายุ</td><td>ไม่ปกติ (ถ้าไม่ใช้ก็อยู่ใน invoice)</td><td>ไม่ปกติ</td><td><strong>สิ้น enrollment anniversary term</strong></td></tr>
+          <tr><td>Deadline (Azure)</td><td>2 เดือน หลังสิ้น billing month</td><td>2 เดือน หลังสิ้น billing month</td><td>2 เดือน หลังสิ้น billing month</td></tr>
+          <tr><td>Deadline (M365/อื่น)</td><td>1 เดือน หลังสิ้น billing month</td><td>1 เดือน หลังสิ้น billing month</td><td>1 เดือน หลังสิ้น billing month</td></tr>
+          <tr><td>ครอบคลุม commerce</td><td>Legacy + NCE</td><td>Legacy + NCE</td><td>EA / EAS / SCE</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Common pitfalls -->
+    <div class="alert danger" style="margin-top:1rem">
+      <span class="icon">&#128165;</span>
+      <div>
+        <strong>Pitfalls ที่พบบ่อย:</strong><br>
+        &#8226; <strong>CSP Indirect Reseller</strong> ยื่นเอง → ถูก reject (ต้องให้ Indirect Provider ยื่น)<br>
+        &#8226; <strong>EA Indirect</strong> ลูกค้ายื่นเองใน Azure Portal → เคสถูกส่งกลับให้ติดต่อ LSP/SSP<br>
+        &#8226; <strong>EA</strong> ยื่นช้าจน credit หมดอายุก่อนได้ใช้ (anniversary term ครบ)<br>
+        &#8226; <strong>Direct</strong> ใช้ personal email แนบเป็น evidence → ถูก reject ต้องเป็น email จาก tenant domain<br>
+        &#8226; ใช้ Advisory incident เป็นหลักฐานหลัก → ปกติไม่เข้าเกณฑ์
+      </div>
+    </div>
+
+    <!-- Quick links -->
+    <h3>&#128279; Portal ที่เกี่ยวข้อง</h3>
+    <a class="source-link" href="https://portal.azure.com" target="_blank" rel="noopener">
+      <span class="src-icon">&#9729;&#65039;</span>
+      <span>
+        <strong>Azure Portal — Help + Support (Direct &amp; EA)</strong>
+        <span class="src-url">portal.azure.com</span>
+      </span>
+    </a>
+    <a class="source-link" href="https://admin.microsoft.com" target="_blank" rel="noopener">
+      <span class="src-icon">&#128188;</span>
+      <span>
+        <strong>Microsoft 365 Admin Center — Support (Direct M365/Dynamics)</strong>
+        <span class="src-url">admin.microsoft.com</span>
+      </span>
+    </a>
+    <a class="source-link" href="https://partner.microsoft.com/dashboard" target="_blank" rel="noopener">
+      <span class="src-icon">&#129309;</span>
+      <span>
+        <strong>Partner Center — Dashboard (CSP)</strong>
+        <span class="src-url">partner.microsoft.com/dashboard</span>
+      </span>
+    </a>
+    <a class="source-link" href="https://vlcentral.microsoft.com" target="_blank" rel="noopener">
+      <span class="src-icon">&#128214;</span>
+      <span>
+        <strong>VL Central — Credits &amp; Transfers (EA Volume Licensing)</strong>
+        <span class="src-url">vlcentral.microsoft.com</span>
+      </span>
+    </a>
+    <a class="source-link" href="https://learn.microsoft.com/azure/cost-management-billing/manage/ea-pricing-overview" target="_blank" rel="noopener">
+      <span class="src-icon">&#128181;</span>
+      <span>
+        <strong>Azure EA Pricing &amp; Credit Process</strong>
+        <span class="src-url">learn.microsoft.com/azure/cost-management-billing/manage/ea-pricing-overview</span>
+      </span>
+    </a>
+    <a class="source-link" href="https://learn.microsoft.com/azure/cost-management-billing/manage/direct-ea-azure-usage-charges-invoices" target="_blank" rel="noopener">
+      <span class="src-icon">&#128202;</span>
+      <span>
+        <strong>EA Usage &amp; Credit Charges — Accounting Codes (รวม O21 SLA Credit)</strong>
+        <span class="src-url">learn.microsoft.com/azure/cost-management-billing/manage/direct-ea-azure-usage-charges-invoices</span>
+      </span>
+    </a>
   </section>
 
   <!-- ====== CALCULATOR ====== -->
