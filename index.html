@@ -765,6 +765,107 @@
     footer a { color: var(--ms-blue); text-decoration: none; border-bottom: 1px dashed color-mix(in srgb, var(--ms-blue) 50%, transparent); }
     footer a:hover { border-bottom-style: solid; }
 
+    /* ---- SIDE NAV (floating right rail) ---- */
+    .side-nav {
+      position: fixed;
+      top: 50%;
+      right: 18px;
+      z-index: 90;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px 10px;
+      background: color-mix(in srgb, var(--surface) 72%, transparent);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      box-shadow: var(--shadow);
+      backdrop-filter: saturate(140%) blur(12px);
+      -webkit-backdrop-filter: saturate(140%) blur(12px);
+      opacity: 0;
+      visibility: hidden;
+      transform: translate(24px, -50%);
+      transition: opacity .35s var(--ease), transform .35s var(--ease), visibility .35s var(--ease);
+    }
+    .side-nav.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(0, -50%);
+    }
+
+    .side-nav a {
+      position: relative;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--border-strong);
+      transition: width .25s var(--ease), height .25s var(--ease),
+                  background .25s var(--ease), box-shadow .3s var(--ease),
+                  transform .25s var(--ease);
+      display: block;
+      flex-shrink: 0;
+    }
+    .side-nav a:hover {
+      background: var(--ms-blue);
+      transform: scale(1.2);
+    }
+
+    /* Tooltip (section label) */
+    .side-nav a::after {
+      content: attr(data-label);
+      position: absolute;
+      right: calc(100% + 14px);
+      top: 50%;
+      transform: translateY(-50%) translateX(6px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .35rem .7rem;
+      white-space: nowrap;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--text);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s var(--ease), transform .2s var(--ease);
+      box-shadow: var(--shadow-sm);
+    }
+    .side-nav a:hover::after,
+    .side-nav a:focus-visible::after {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+
+    /* Active dot — raised / embossed effect */
+    .side-nav a.active {
+      width: 22px;
+      height: 22px;
+      background:
+        radial-gradient(circle at 30% 28%, rgba(255,255,255,.55), transparent 55%),
+        linear-gradient(135deg, var(--ms-blue) 0%, var(--ms-accent) 100%);
+      box-shadow:
+        0 0 0 4px color-mix(in srgb, var(--ms-blue) 18%, transparent),
+        0 8px 18px -4px color-mix(in srgb, var(--ms-blue) 70%, transparent),
+        inset 0 2px 2px rgba(255,255,255,.4),
+        inset 0 -2px 3px rgba(0,0,0,.25);
+      transform: scale(1);
+      animation: sideDotPulse 2.6s var(--ease) infinite;
+    }
+
+    @keyframes sideDotPulse {
+      0%, 100% { box-shadow:
+        0 0 0 4px color-mix(in srgb, var(--ms-blue) 18%, transparent),
+        0 8px 18px -4px color-mix(in srgb, var(--ms-blue) 70%, transparent),
+        inset 0 2px 2px rgba(255,255,255,.4),
+        inset 0 -2px 3px rgba(0,0,0,.25); }
+      50%     { box-shadow:
+        0 0 0 8px color-mix(in srgb, var(--ms-blue) 8%, transparent),
+        0 10px 22px -4px color-mix(in srgb, var(--ms-blue) 75%, transparent),
+        inset 0 2px 2px rgba(255,255,255,.4),
+        inset 0 -2px 3px rgba(0,0,0,.25); }
+    }
+
+    @media (max-width: 860px) { .side-nav { display: none; } }
+
     /* ---- Motion preference ---- */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -776,7 +877,7 @@
 
     /* ---- Print ---- */
     @media print {
-      nav.tabs, .theme-toggle, .btn-calc, .btn-reset, .btn-copy { display: none !important; }
+      nav.tabs, .theme-toggle, .side-nav, .btn-calc, .btn-reset, .btn-copy { display: none !important; }
       body { background: #fff; }
       .card, .calc-section, .tbl-wrap { box-shadow: none; border-color: #ccc; }
     }
@@ -788,6 +889,23 @@
 <button class="theme-toggle" type="button" id="theme-toggle" aria-label="สลับโหมดสว่าง/มืด" title="สลับโหมด">
   <span id="theme-icon" aria-hidden="true">&#127769;</span>
 </button>
+
+<!-- SIDE NAV (floating right) -->
+<nav class="side-nav" id="side-nav" aria-label="นำทางหน้า (รายการย่อ)">
+  <a href="#overview"         data-label="ภาพรวม SLA"></a>
+  <a href="#october-sla"      data-label="SLA ตุลาคม"></a>
+  <a href="#detect"           data-label="ตรวจจับ Outage"></a>
+  <a href="#health-types"     data-label="ประเภทใน Service Health"></a>
+  <a href="#evaluate"         data-label="ประเมิน SLA"></a>
+  <a href="#evidence"         data-label="รวบรวมหลักฐาน"></a>
+  <a href="#claim"            data-label="ขอเคลม"></a>
+  <a href="#workflow-request" data-label="Workflow: Direct/CSP/EA"></a>
+  <a href="#calculator"       data-label="คำนวณ SLA"></a>
+  <a href="#ticket-template"  data-label="สร้าง Ticket"></a>
+  <a href="#deadline"         data-label="กำหนดเวลา"></a>
+  <a href="#abbrev"           data-label="รหัส Incident"></a>
+  <a href="#sources"          data-label="แหล่งอ้างอิง"></a>
+</nav>
 
 <!-- HEADER -->
 <header>
@@ -2204,26 +2322,46 @@
 </footer>
 
 <script>
-  /* ===== ACTIVE NAV ON SCROLL ===== */
+  /* ===== ACTIVE NAV ON SCROLL (top tabs + floating side-nav) ===== */
   const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('nav.tabs a');
+  const topLinks = document.querySelectorAll('nav.tabs a');
+  const sideLinks = document.querySelectorAll('.side-nav a');
+  const allNavLinks = [...topLinks, ...sideLinks];
+
+  function setActive(id) {
+    allNavLinks.forEach(a => a.classList.remove('active'));
+    document.querySelectorAll(`nav.tabs a[href="#${id}"], .side-nav a[href="#${id}"]`)
+      .forEach(a => a.classList.add('active'));
+  }
+
   const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        navLinks.forEach(a => a.classList.remove('active'));
-        const link = document.querySelector(`nav.tabs a[href="#${e.target.id}"]`);
-        if (link) link.classList.add('active');
-      }
-    });
+    entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id); });
   }, { threshold: 0.35 });
   sections.forEach(s => observer.observe(s));
 
-  navLinks.forEach(a => {
+  allNavLinks.forEach(a => {
     a.addEventListener('click', e => {
       e.preventDefault();
       document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
     });
   });
+
+  /* ===== SIDE NAV: show after user scrolls past hero ===== */
+  (function sideNavReveal() {
+    const sideNav = document.getElementById('side-nav');
+    if (!sideNav) return;
+    const threshold = 320;
+    let ticking = false;
+    function update() {
+      if (window.scrollY > threshold) sideNav.classList.add('visible');
+      else sideNav.classList.remove('visible');
+      ticking = false;
+    }
+    window.addEventListener('scroll', () => {
+      if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
+    }, { passive: true });
+    update();
+  })();
 
   /* ===== OCTOBER SLA THRESHOLD CHECKER ===== */
   function checkOctoberSLA() {
