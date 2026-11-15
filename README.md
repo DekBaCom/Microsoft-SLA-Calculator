@@ -23,8 +23,9 @@
 - **ปรับขนาดอัตโนมัติ** รองรับทั้งมือถือ แท็บเล็ต และเดสก์ท็อป ด้วย fluid typography (`clamp()`) และ grid แบบ `auto-fit/minmax()`
 - **Dark Mode** พร้อมปุ่มสลับที่มุมบนขวา (จำค่าใน `localStorage` และ auto-detect `prefers-color-scheme`)
 - **Sticky Nav** แบบ glassmorphism (backdrop-filter) ที่เลื่อนแนวนอนบนมือถือและ wrap ตรงกลางบนเดสก์ท็อป
-- **Accessibility**: `:focus-visible` ring ชัดเจน, รองรับ `prefers-reduced-motion`, `aria-label` บนปุ่ม toggle
-- **Print-friendly**: ปุ่มและ toggle ซ่อนอัตโนมัติเมื่อสั่งพิมพ์
+- **Floating Side-Nav** จุดนำทางด้านขวาที่ปรากฏเมื่อเลื่อนลงเกิน 320px จุดของ section ที่กำลังดูจะแสดงเป็น **ลูกปัดนูน** (gradient + layered shadow + pulsing ring) พร้อม tooltip ชื่อ section เมื่อ hover; sync กับ top nav อัตโนมัติผ่าน `IntersectionObserver` และซ่อนบนจอ ≤ 860px
+- **Accessibility**: `:focus-visible` ring ชัดเจน, รองรับ `prefers-reduced-motion`, `aria-label` บนปุ่ม toggle และ side-nav
+- **Print-friendly**: ปุ่ม, toggle และ side-nav ซ่อนอัตโนมัติเมื่อสั่งพิมพ์
 
 ## เริ่มใช้งาน
 
