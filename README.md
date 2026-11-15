@@ -23,8 +23,9 @@
 - **ปรับขนาดอัตโนมัติ** รองรับทั้งมือถือ แท็บเล็ต และเดสก์ท็อป ด้วย fluid typography (`clamp()`) และ grid แบบ `auto-fit/minmax()`
 - **Dark Mode** พร้อมปุ่มสลับที่มุมบนขวา (จำค่าใน `localStorage` และ auto-detect `prefers-color-scheme`)
 - **Sticky Nav** แบบ glassmorphism (backdrop-filter) ที่เลื่อนแนวนอนบนมือถือและ wrap ตรงกลางบนเดสก์ท็อป
-- **Floating Side-Nav** จุดนำทางด้านขวาที่ปรากฏเมื่อเลื่อนลงเกิน 320px จุดของ section ที่กำลังดูจะแสดงเป็น **ลูกปัดนูน** (gradient + layered shadow + pulsing ring) พร้อม tooltip ชื่อ section เมื่อ hover; sync กับ top nav อัตโนมัติผ่าน `IntersectionObserver` และซ่อนบนจอ ≤ 860px
-- **Accessibility**: `:focus-visible` ring ชัดเจน, รองรับ `prefers-reduced-motion`, `aria-label` บนปุ่ม toggle และ side-nav
+- **Floating Side-Nav** แถบนำทางด้านขวาแบบ **text pills** ที่ปรากฏเมื่อเลื่อนลงเกิน 320px — แสดงชื่อ section ทุกอันตลอดเวลา (ไม่ใช่แค่ hover) และ pill ของ section ที่กำลังดูจะเป็น **สีน้ำเงินเข้มแบบนูน** (dark gradient + layered inset/drop shadow + glow bar ด้านซ้าย + pulsing ring + bold text-shadow) sync กับ top nav อัตโนมัติผ่าน `IntersectionObserver` และซ่อนบนจอ ≤ 960px
+- **Accessibility**: `:focus-visible` ring ชัดเจน, รองรับ `prefers-reduced-motion`, `aria-label` บนปุ่ม toggle, side-nav และปุ่ม social
+- **Social**: ปุ่ม LinkedIn แบบ gradient ที่ footer เปิดลิงก์ไปยังโปรไฟล์ผู้พัฒนาใน tab ใหม่
 - **Print-friendly**: ปุ่ม, toggle และ side-nav ซ่อนอัตโนมัติเมื่อสั่งพิมพ์
 
 ## เริ่มใช้งาน
