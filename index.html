@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" data-ui-lang="th">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -173,12 +173,23 @@
       font-weight: 500;
     }
 
-    /* Theme toggle */
-    .theme-toggle {
+    /* ---- i18n (bilingual TH / EN) ---- */
+    .lang-en { display: none; }
+    html[data-ui-lang="en"] .lang-th { display: none; }
+    html[data-ui-lang="en"] .lang-en { display: revert; }
+
+    /* Top-right controls (theme + language) */
+    .top-controls {
       position: fixed;
       top: calc(env(safe-area-inset-top, 0px) + 12px);
       right: 14px;
       z-index: 200;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .theme-toggle, .lang-toggle {
       width: 42px;
       height: 42px;
       border-radius: 50%;
@@ -193,8 +204,20 @@
       align-items: center;
       justify-content: center;
       transition: transform .25s var(--ease), background .25s var(--ease);
+      font-family: inherit;
     }
     .theme-toggle:hover { transform: scale(1.07) rotate(12deg); background: rgba(0,0,0,.35); }
+
+    .lang-toggle {
+      width: auto;
+      min-width: 52px;
+      padding: 0 .8rem;
+      border-radius: 999px;
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .3px;
+    }
+    .lang-toggle:hover { transform: scale(1.05); background: rgba(0,0,0,.35); }
 
     /* ---- NAV TABS ---- */
     nav.tabs {
@@ -937,57 +960,69 @@
 </head>
 <body>
 
-<!-- THEME TOGGLE -->
-<button class="theme-toggle" type="button" id="theme-toggle" aria-label="สลับโหมดสว่าง/มืด" title="สลับโหมด">
-  <span id="theme-icon" aria-hidden="true">&#127769;</span>
-</button>
+<!-- TOP RIGHT CONTROLS -->
+<div class="top-controls">
+  <button class="lang-toggle" type="button" id="lang-toggle" aria-label="Switch language / สลับภาษา" title="Switch language">
+    <span class="lang-th">EN</span>
+    <span class="lang-en">ไทย</span>
+  </button>
+  <button class="theme-toggle" type="button" id="theme-toggle" aria-label="สลับโหมดสว่าง/มืด" title="สลับโหมด / Toggle theme">
+    <span id="theme-icon" aria-hidden="true">&#127769;</span>
+  </button>
+</div>
 
 <!-- SIDE NAV (floating right, text pills) -->
-<nav class="side-nav" id="side-nav" aria-label="นำทางหน้าแบบเลื่อน">
-  <a href="#overview">ภาพรวม SLA</a>
-  <a href="#october-sla">SLA ตุลาคม</a>
-  <a href="#detect">1 · ตรวจจับ Outage</a>
-  <a href="#health-types">ประเภทใน Service Health</a>
-  <a href="#evaluate">2 · ประเมิน SLA</a>
-  <a href="#calculator">คำนวณ SLA</a>
-  <a href="#evidence">3 · รวบรวมหลักฐาน</a>
-  <a href="#workflow-request">Workflow: Direct/CSP/EA</a>
-  <a href="#claim">4 · ขอเคลม</a>
-  <a href="#ticket-template">สร้าง Ticket</a>
-  <a href="#deadline">กำหนดเวลา</a>
-  <a href="#abbrev">รหัส Incident</a>
-  <a href="#sources">แหล่งอ้างอิง</a>
+<nav class="side-nav" id="side-nav" aria-label="Section navigation">
+  <a href="#overview"><span class="lang-th">ภาพรวม SLA</span><span class="lang-en">SLA Overview</span></a>
+  <a href="#october-sla"><span class="lang-th">SLA ตุลาคม</span><span class="lang-en">October SLA</span></a>
+  <a href="#detect"><span class="lang-th">1 · ตรวจจับ Outage</span><span class="lang-en">1 · Detect Outage</span></a>
+  <a href="#health-types"><span class="lang-th">ประเภทใน Service Health</span><span class="lang-en">Service Health Types</span></a>
+  <a href="#evaluate"><span class="lang-th">2 · ประเมิน SLA</span><span class="lang-en">2 · Evaluate SLA</span></a>
+  <a href="#calculator"><span class="lang-th">คำนวณ SLA</span><span class="lang-en">SLA Calculator</span></a>
+  <a href="#evidence"><span class="lang-th">3 · รวบรวมหลักฐาน</span><span class="lang-en">3 · Collect Evidence</span></a>
+  <a href="#workflow-request"><span class="lang-th">Workflow: Direct/CSP/EA</span><span class="lang-en">Workflow: Direct/CSP/EA</span></a>
+  <a href="#claim"><span class="lang-th">4 · ขอเคลม</span><span class="lang-en">4 · Submit Claim</span></a>
+  <a href="#ticket-template"><span class="lang-th">สร้าง Ticket</span><span class="lang-en">Ticket Template</span></a>
+  <a href="#deadline"><span class="lang-th">กำหนดเวลา</span><span class="lang-en">Deadlines</span></a>
+  <a href="#abbrev"><span class="lang-th">รหัส Incident</span><span class="lang-en">Incident Codes</span></a>
+  <a href="#sources"><span class="lang-th">แหล่งอ้างอิง</span><span class="lang-en">References</span></a>
 </nav>
 
 <!-- HEADER -->
 <header>
   <div class="logo">&#xe2b1; Microsoft <span>SLA</span> Outage Guide</div>
-  <p>คู่มือประเมิน SLA และการเคลม Service Credit เมื่อ Microsoft Service เกิด Outage</p>
-  <span class="badge">อ้างอิงจาก Microsoft.com เท่านั้น &nbsp;|&nbsp; อัปเดต 2025–2026</span>
+  <p>
+    <span class="lang-th">คู่มือประเมิน SLA และการเคลม Service Credit เมื่อ Microsoft Service เกิด Outage</span>
+    <span class="lang-en">Guide to evaluating SLA and claiming Service Credit when a Microsoft service outage occurs</span>
+  </p>
+  <span class="badge">
+    <span class="lang-th">อ้างอิงจาก Microsoft.com เท่านั้น &nbsp;|&nbsp; อัปเดต 2025–2026</span>
+    <span class="lang-en">Sourced from Microsoft.com only &nbsp;|&nbsp; Updated 2025–2026</span>
+  </span>
 </header>
 
 <!-- TAB NAV -->
 <nav class="tabs">
-  <a href="#overview" class="active">&#127775; ภาพรวม SLA</a>
-  <a href="#october-sla">&#128197; SLA ตุลาคม</a>
-  <a href="#detect">&#128270; 1 · ตรวจจับ Outage</a>
-  <a href="#health-types">&#128737;&#65039; ประเภทใน Service Health</a>
-  <a href="#evaluate">&#128202; 2 · ประเมิน SLA</a>
-  <a href="#calculator">&#129518; คำนวณ SLA</a>
-  <a href="#evidence">&#128196; 3 · รวบรวมหลักฐาน</a>
-  <a href="#workflow-request">&#128230; Workflow: Direct/CSP/EA</a>
-  <a href="#claim">&#127381; 4 · ขอเคลม</a>
-  <a href="#ticket-template">&#128221; สร้าง Ticket</a>
-  <a href="#deadline">&#9201;&#65039; กำหนดเวลา</a>
-  <a href="#abbrev">&#128204; รหัส Incident</a>
-  <a href="#sources">&#128279; แหล่งอ้างอิง</a>
+  <a href="#overview" class="active"><span class="lang-th">&#127775; ภาพรวม SLA</span><span class="lang-en">&#127775; SLA Overview</span></a>
+  <a href="#october-sla"><span class="lang-th">&#128197; SLA ตุลาคม</span><span class="lang-en">&#128197; October SLA</span></a>
+  <a href="#detect"><span class="lang-th">&#128270; 1 · ตรวจจับ Outage</span><span class="lang-en">&#128270; 1 · Detect Outage</span></a>
+  <a href="#health-types"><span class="lang-th">&#128737;&#65039; ประเภทใน Service Health</span><span class="lang-en">&#128737;&#65039; Service Health Types</span></a>
+  <a href="#evaluate"><span class="lang-th">&#128202; 2 · ประเมิน SLA</span><span class="lang-en">&#128202; 2 · Evaluate SLA</span></a>
+  <a href="#calculator"><span class="lang-th">&#129518; คำนวณ SLA</span><span class="lang-en">&#129518; SLA Calculator</span></a>
+  <a href="#evidence"><span class="lang-th">&#128196; 3 · รวบรวมหลักฐาน</span><span class="lang-en">&#128196; 3 · Collect Evidence</span></a>
+  <a href="#workflow-request"><span class="lang-th">&#128230; Workflow: Direct/CSP/EA</span><span class="lang-en">&#128230; Workflow: Direct/CSP/EA</span></a>
+  <a href="#claim"><span class="lang-th">&#127381; 4 · ขอเคลม</span><span class="lang-en">&#127381; 4 · Submit Claim</span></a>
+  <a href="#ticket-template"><span class="lang-th">&#128221; สร้าง Ticket</span><span class="lang-en">&#128221; Ticket Template</span></a>
+  <a href="#deadline"><span class="lang-th">&#9201;&#65039; กำหนดเวลา</span><span class="lang-en">&#9201;&#65039; Deadlines</span></a>
+  <a href="#abbrev"><span class="lang-th">&#128204; รหัส Incident</span><span class="lang-en">&#128204; Incident Codes</span></a>
+  <a href="#sources"><span class="lang-th">&#128279; แหล่งอ้างอิง</span><span class="lang-en">&#128279; References</span></a>
 </nav>
 
 <main>
 
   <!-- ====== OVERVIEW ====== -->
   <section id="overview">
-    <h2>&#127775; ภาพรวม: Microsoft SLA คืออะไร</h2>
+    <h2><span class="lang-th">&#127775; ภาพรวม: Microsoft SLA คืออะไร</span><span class="lang-en">&#127775; Overview: What is a Microsoft SLA?</span></h2>
     <div class="card blue-top">
       <p>
         <strong>Service Level Agreement (SLA)</strong> คือสัญญาที่ Microsoft ให้ไว้กับลูกค้าเกี่ยวกับ <em>uptime และ connectivity</em>
@@ -1037,7 +1072,7 @@
 
   <!-- ====== OCTOBER SLA THRESHOLDS ====== -->
   <section id="october-sla">
-    <h2>&#128197; เกณฑ์ SLA เดือนตุลาคม — 31 วัน</h2>
+    <h2><span class="lang-th">&#128197; เกณฑ์ SLA เดือนตุลาคม — 31 วัน</span><span class="lang-en">&#128197; October SLA Thresholds — 31 days</span></h2>
     <div class="alert info">
       <span class="icon">&#8505;&#65039;</span>
       <div>
@@ -1123,14 +1158,14 @@
           <span class="hint">หัก Scheduled / Planned Maintenance ที่เข้าเงื่อนไขแล้ว</span>
         </div>
       </div>
-      <button class="btn-calc" type="button" onclick="checkOctoberSLA()">&#128269; ตรวจเกณฑ์ SLA เดือนตุลาคม</button>
+      <button class="btn-calc" type="button" onclick="checkOctoberSLA()"><span class="lang-th">&#128269; ตรวจเกณฑ์ SLA เดือนตุลาคม</span><span class="lang-en">&#128269; Check October SLA Threshold</span></button>
       <div id="oct-result" class="alert info" style="display:none;margin-top:1rem"></div>
     </div>
   </section>
 
   <!-- ====== DETECT ====== -->
   <section id="detect">
-    <h2>&#128270; ขั้นตอนที่ 1 — ตรวจจับ Outage</h2>
+    <h2><span class="lang-th">&#128270; ขั้นตอนที่ 1 — ตรวจจับ Outage</span><span class="lang-en">&#128270; Step 1 — Detect the Outage</span></h2>
 
     <div class="steps">
       <div class="step">
@@ -1170,7 +1205,7 @@
 
   <!-- ====== HEALTH TYPES ====== -->
   <section id="health-types">
-    <h2>&#128737;&#65039; ประเภทที่ Service Health แสดง — แบบไหนเคลม SLA ได้</h2>
+    <h2><span class="lang-th">&#128737;&#65039; ประเภทที่ Service Health แสดง — แบบไหนเคลม SLA ได้</span><span class="lang-en">&#128737;&#65039; Service Health Event Types — Which Qualify for SLA Credit</span></h2>
 
     <div class="alert info">
       <span class="icon">&#8505;&#65039;</span>
@@ -1380,7 +1415,7 @@
 
   <!-- ====== EVALUATE ====== -->
   <section id="evaluate">
-    <h2>&#128202; ขั้นตอนที่ 2 — ประเมิน SLA (5-Pass Method)</h2>
+    <h2><span class="lang-th">&#128202; ขั้นตอนที่ 2 — ประเมิน SLA (5-Pass Method)</span><span class="lang-en">&#128202; Step 2 — Evaluate SLA (5-Pass Method)</span></h2>
 
     <div class="grid-2">
       <div class="card">
@@ -1435,7 +1470,7 @@
 
   <!-- ====== CALCULATOR ====== -->
   <section id="calculator">
-    <h2>&#129518; SLA Calculator — คำนวณ Uptime และ Credit</h2>
+    <h2><span class="lang-th">&#129518; SLA Calculator — คำนวณ Uptime และ Credit</span><span class="lang-en">&#129518; SLA Calculator — Uptime and Credit</span></h2>
 
     <div class="calc-section">
       <div class="calc-grid">
@@ -1506,8 +1541,8 @@
 
       </div>
 
-      <button class="btn-calc" onclick="calcSLA()">&#9654;&#65039; คำนวณ SLA</button>
-      <button class="btn-reset" onclick="resetCalc()">&#8635; รีเซ็ต</button>
+      <button class="btn-calc" onclick="calcSLA()"><span class="lang-th">&#9654;&#65039; คำนวณ SLA</span><span class="lang-en">&#9654;&#65039; Calculate SLA</span></button>
+      <button class="btn-reset" onclick="resetCalc()"><span class="lang-th">&#8635; รีเซ็ต</span><span class="lang-en">&#8635; Reset</span></button>
 
       <!-- RESULT -->
       <div id="calc-result">
@@ -1575,7 +1610,7 @@
 
   <!-- ====== EVIDENCE ====== -->
   <section id="evidence">
-    <h2>&#128196; ขั้นตอนที่ 3 — รวบรวมหลักฐาน</h2>
+    <h2><span class="lang-th">&#128196; ขั้นตอนที่ 3 — รวบรวมหลักฐาน</span><span class="lang-en">&#128196; Step 3 — Collect Evidence</span></h2>
 
     <p style="margin-bottom:.9rem;color:var(--text-muted);font-size:.93rem">
       Microsoft แบ่งหลักฐานเป็น <strong>2 ชุด</strong> — <em>Required Information</em> (ข้อมูลพื้นฐานบังคับทุกเคส)
@@ -1626,7 +1661,7 @@
 
   <!-- ====== WORKFLOW REQUEST BY LICENSING MODEL ====== -->
   <section id="workflow-request">
-    <h2>&#128230; Workflow Request — แยกตามประเภทสัญญา (Direct / CSP / EA)</h2>
+    <h2><span class="lang-th">&#128230; Workflow Request — แยกตามประเภทสัญญา (Direct / CSP / EA)</span><span class="lang-en">&#128230; Workflow Request — By Licensing Model (Direct / CSP / EA)</span></h2>
 
     <div class="alert info">
       <span class="icon">&#8505;&#65039;</span>
@@ -1854,7 +1889,7 @@
 
   <!-- ====== CLAIM ====== -->
   <section id="claim">
-    <h2>&#127381; ขั้นตอนที่ 4 — วิธีการเคลม SLA Credit</h2>
+    <h2><span class="lang-th">&#127381; ขั้นตอนที่ 4 — วิธีการเคลม SLA Credit</span><span class="lang-en">&#127381; Step 4 — How to Submit an SLA Credit Claim</span></h2>
 
     <div class="grid-2">
       <!-- Azure -->
@@ -2010,7 +2045,7 @@
 
   <!-- ====== TICKET TEMPLATE ====== -->
   <section id="ticket-template">
-    <h2>&#128221; SLA Credit Request Template Generator</h2>
+    <h2><span class="lang-th">&#128221; สร้าง Ticket ขอ SLA Credit (เทมเพลต)</span><span class="lang-en">&#128221; SLA Credit Request Template Generator</span></h2>
 
     <div class="alert info">
       <span class="icon">&#8505;&#65039;</span>
@@ -2083,11 +2118,11 @@
         </div>
       </div>
 
-      <button class="btn-calc" onclick="generateTicketTemplate()">&#128221; สร้างข้อความสำหรับ Ticket</button>
+      <button class="btn-calc" onclick="generateTicketTemplate()"><span class="lang-th">&#128221; สร้างข้อความสำหรับ Ticket</span><span class="lang-en">&#128221; Generate Ticket Text</span></button>
 
       <textarea id="ticket-output" class="template-output" aria-label="ข้อความ Ticket ที่สร้างขึ้น" placeholder="ข้อความ Ticket ที่สร้างขึ้นจะแสดงที่นี่"></textarea>
       <div class="template-actions">
-        <button class="btn-calc btn-copy" type="button" onclick="copyTicketTemplate()">&#128203; คัดลอกข้อความ</button>
+        <button class="btn-calc btn-copy" type="button" onclick="copyTicketTemplate()"><span class="lang-th">&#128203; คัดลอกข้อความ</span><span class="lang-en">&#128203; Copy Text</span></button>
         <span id="copy-status" class="copy-status" role="status" aria-live="polite"></span>
       </div>
     </div>
@@ -2095,7 +2130,7 @@
 
   <!-- ====== DEADLINE ====== -->
   <section id="deadline">
-    <h2>&#9201;&#65039; กำหนดเวลายื่นเคลม (Critical Deadlines)</h2>
+    <h2><span class="lang-th">&#9201;&#65039; กำหนดเวลายื่นเคลม (Critical Deadlines)</span><span class="lang-en">&#9201;&#65039; Submission Deadlines (Critical)</span></h2>
 
     <div class="tbl-wrap">
       <table>
@@ -2155,7 +2190,7 @@
 
   <!-- ====== ABBREV ====== -->
   <section id="abbrev">
-    <h2>&#128204; รหัส Incident ID ของแต่ละบริการ</h2>
+    <h2><span class="lang-th">&#128204; รหัส Incident ID ของแต่ละบริการ</span><span class="lang-en">&#128204; Incident ID Code Prefixes by Service</span></h2>
     <div class="tbl-wrap">
       <table>
         <thead>
@@ -2181,7 +2216,7 @@
 
   <!-- ====== SOURCES ====== -->
   <section id="sources">
-    <h2>&#128279; แหล่งอ้างอิงจาก Microsoft.com</h2>
+    <h2><span class="lang-th">&#128279; แหล่งอ้างอิงจาก Microsoft.com</span><span class="lang-en">&#128279; References from Microsoft.com</span></h2>
 
     <a class="source-link" href="https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services" target="_blank" rel="noopener">
       <span class="src-icon">&#128196;</span>
@@ -2259,11 +2294,16 @@
 </main>
 
 <footer>
-  ข้อมูลอ้างอิงจาก
+  <span class="lang-th">ข้อมูลอ้างอิงจาก</span>
+  <span class="lang-en">Sourced from</span>
   <a href="https://www.microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services" target="_blank">Microsoft Licensing SLA</a>,
   <a href="https://learn.microsoft.com/en-us/partner-center/customers/report-problems-on-behalf-of-a-customer" target="_blank">Partner Center Docs</a>
-  และ <a href="https://learn.microsoft.com/azure/reliability/concept-service-level-agreements" target="_blank">Azure Reliability Docs</a>
-  &nbsp;|&nbsp; ใช้ข้อมูลจาก Microsoft.com เท่านั้น
+  <span class="lang-th">และ</span>
+  <span class="lang-en">and</span>
+  <a href="https://learn.microsoft.com/azure/reliability/concept-service-level-agreements" target="_blank">Azure Reliability Docs</a>
+  &nbsp;|&nbsp;
+  <span class="lang-th">ใช้ข้อมูลจาก Microsoft.com เท่านั้น</span>
+  <span class="lang-en">Information from Microsoft.com only</span>
   <br style="margin-top:.5rem" />
   <span style="margin-top:.6rem;display:inline-block;opacity:.85;">
     Contributed by <strong>Mr. Abdulloh Etaeluengoh</strong>
@@ -2387,7 +2427,7 @@
     const netDownMin = Math.max(0, rawDownMin - maintMin);
 
     if (netDownMin > totalMin) {
-      alert('Downtime มากกว่า Total Billable Minutes — กรุณาตรวจสอบข้อมูล');
+      alert(i18n('Downtime มากกว่า Total Billable Minutes — กรุณาตรวจสอบข้อมูล', 'Downtime exceeds Total Billable Minutes — please verify your inputs'));
       return;
     }
 
@@ -2516,7 +2556,7 @@
 
   function generateTicketTemplate() {
     if (!lastCalculation) {
-      alert('กรุณากด “คำนวณ SLA” ก่อนสร้างข้อความสำหรับ Ticket');
+      alert(i18n('กรุณากด "คำนวณ SLA" ก่อนสร้างข้อความสำหรับ Ticket', 'Please click "Calculate SLA" before generating the ticket text'));
       document.getElementById('calculator').scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
@@ -2596,18 +2636,18 @@
     const output = document.getElementById('ticket-output');
     const status = document.getElementById('copy-status');
     if (!output.value.trim()) {
-      status.textContent = 'กรุณาสร้างข้อความสำหรับ Ticket ก่อน';
+      status.textContent = i18n('กรุณาสร้างข้อความสำหรับ Ticket ก่อน', 'Please generate the ticket text first');
       return;
     }
 
     try {
       await navigator.clipboard.writeText(output.value);
-      status.textContent = 'คัดลอกข้อความแล้ว';
+      status.textContent = i18n('คัดลอกข้อความแล้ว', 'Copied to clipboard');
     } catch (error) {
       output.focus();
       output.select();
       document.execCommand('copy');
-      status.textContent = 'เลือกข้อความแล้ว — สามารถกด Ctrl+C เพื่อคัดลอก';
+      status.textContent = i18n('เลือกข้อความแล้ว — สามารถกด Ctrl+C เพื่อคัดลอก', 'Text selected — press Ctrl+C to copy');
     }
   }
 
@@ -2616,6 +2656,34 @@
     document.getElementById('cal-cost').value = '';
     document.getElementById('calc-result').style.display = 'none';
     lastCalculation = null;
+  }
+
+  /* ===== LANGUAGE TOGGLE (TH / EN) ===== */
+  (function initLang() {
+    const root = document.documentElement;
+    const btn = document.getElementById('lang-toggle');
+    if (!btn) return;
+    const stored = localStorage.getItem('sla-lang');
+    const current = (stored === 'en' || stored === 'th') ? stored : 'th';
+
+    function apply(lang) {
+      root.setAttribute('data-ui-lang', lang);
+      root.setAttribute('lang', lang);
+      btn.setAttribute('aria-label', lang === 'th' ? 'Switch to English' : 'สลับเป็นภาษาไทย');
+      btn.setAttribute('title', lang === 'th' ? 'Switch to English' : 'สลับเป็นภาษาไทย');
+    }
+    apply(current);
+
+    btn.addEventListener('click', () => {
+      const next = root.getAttribute('data-ui-lang') === 'th' ? 'en' : 'th';
+      localStorage.setItem('sla-lang', next);
+      apply(next);
+    });
+  })();
+
+  /* Helper: pick localized string based on current UI language */
+  function i18n(th, en) {
+    return document.documentElement.getAttribute('data-ui-lang') === 'en' ? en : th;
   }
 
   /* ===== THEME TOGGLE (light / dark) ===== */
