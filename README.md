@@ -13,6 +13,8 @@
 - มีตารางและตัวตรวจสอบเกณฑ์ SLA เดือนตุลาคม (31 วัน) สำหรับ Microsoft 365, Dynamics 365, Intune และ Azure SLA profiles
 - สร้างร่างภาษาอังกฤษสำหรับเปิด Support Ticket / ขอ SLA Service Credit พร้อมรายการรายละเอียดที่ควรระบุและปุ่มคัดลอก
 - คู่มือเฉพาะสำหรับ **CSP Partner** ยื่น Credit Request ผ่าน Partner Center: prerequisites, GDAP, ตารางเลือกเส้นทาง ticket, 8 ขั้นตอนโดยละเอียด, Required Information และ Evidence ของผลกระทบ
+- **ประเภทใน Service Health** ที่ใช้เคลมได้ / ไม่ได้ — จำแนก Incident vs Advisory, Issue Origin, Status และ Azure event types (Service issues, Planned maintenance, Health/Security advisories, Billing updates) พร้อมตารางตัดสินใจ
+- **Workflow Request แยกตามประเภทสัญญา** — เส้นทาง portal, ผู้ยื่น, บทบาท, รูปแบบเครดิต และข้อควรระวังสำหรับ Direct / CSP / EA
 - สรุปช่วงเวลาสำหรับยื่นคำขอ: Azure ภายใน 60 วันนับจาก Incident; บริการอื่นภายในสิ้นสุด Applicable Period ถัดจากเดือนที่เกิด Incident
 - รวมลิงก์เอกสารอ้างอิงจาก Microsoft และ Microsoft Learn
 
@@ -168,6 +170,75 @@
 
 Credit จะถูก prorate ตามบริการที่กระทบและ duration ของ outage แล้วปรากฏใน invoice ถัดไปและ **Reconciliation File** ที่ Partner Center → *Billing → Invoices & reconciliation* ใช้ไฟล์นี้ map กลับไปยัง customer/subscription เพื่อออก credit note ให้ลูกค้าปลายทาง
 
+## ประเภทใน Service Health ที่ใช้เคลม SLA ได้
+
+ในหน้าเว็บเปิดเมนู **ประเภทใน Service Health** เพื่อดูการจำแนกเหตุการณ์แบบละเอียด — ไม่ใช่ทุก event ที่แสดงใน Service Health จะเคลม SLA Credit ได้ ต้องแยก **ประเภท (type)**, **ต้นตอ (issue origin)** และ **สถานะ (status)** ก่อน
+
+### Microsoft 365 / Dynamics 365 / Intune
+
+- **Incident** — บริการหรือฟังก์ชันหลักใช้งานไม่ได้ ✅ เคลมได้ (ถ้า uptime ต่ำกว่า SLA)
+- **Advisory** — รับรู้ปัญหาแต่บริการยังใช้งานได้ ⚠️ ปกติไม่เข้าเกณฑ์ ต้องพิสูจน์ user impact จริง
+- **Issue Origin**: Microsoft infrastructure ✅ เคลมได้; Third-party หรือ Customer infrastructure ❌ ไม่ได้
+- **Status ที่เป็นหลักฐานได้**: Service degradation, Service interruption, Restoring service, Extended recovery, Service restored, Post-incident report published
+- **Status ที่ตัดสิทธิ์**: False positive
+- Planned maintenance ของ M365 **ไม่แสดง**ใน Service Health แต่อยู่ใน **Message Center** หมวด *Plan for change*
+
+### Azure Service Health — 5 ประเภท Event
+
+| Event Type | เคลม SLA ได้? | หมายเหตุ |
+| --- | --- | --- |
+| **Service issues** | ✅ Error / Warning เข้าเกณฑ์ | ตรวจ `properties.EventType = ServiceIssue` |
+| **Planned maintenance** | ❌ ไม่ได้ — SLA exclusion | หักออกจาก Downtime ถ้ามี |
+| **Health advisories** | ❌ ไม่ได้ — เป็นคำแนะนำ | เช่น deprecation, retirement |
+| **Security advisories** | ❌ ไม่ได้ — การแจ้งเตือน | อาจกระทบ availability แต่ไม่เข้า SLA |
+| **Billing updates** | ❌ ไม่เกี่ยวกับ SLA | - |
+
+ตรวจเพิ่มได้ผ่าน **Azure Resource Graph** ที่ตาราง `ServiceHealthResources` field `properties.EventType` และ `properties.Status`
+
+### ข้อมูลที่ควรบันทึกจาก Service Health ทุก event
+
+Tracking/Incident ID, Event Type, Issue Origin, Status, Impact start/mitigation time, Affected services & regions, Scope (subscription/tenant), ลิงก์ไปยัง PIR (ถ้ามี)
+
+## Workflow Request — แยกตามประเภทสัญญา (Direct / CSP / EA)
+
+ในหน้าเว็บเปิดเมนู **Workflow: Direct/CSP/EA** เพื่อดูรายละเอียดเต็ม วิธียื่น SLA Credit ขึ้นกับ **Licensing Model** ของ subscription ที่ได้รับผลกระทบ
+
+### ตรวจประเภทสัญญาก่อน
+
+- ซื้อตรงจาก microsoft.com / admin.microsoft.com / portal.azure.com → **Direct** (Web Direct / MCA)
+- ซื้อผ่าน Partner ใบเสร็จออกโดย Partner → **CSP**
+- มี Enrollment Number, สัญญา EA/EAS/SCE 3 ปี → **EA (Enterprise Agreement)**
+- ไม่แน่ใจ → ตรวจที่ *Azure Portal → Cost Management + Billing → Billing scopes* ดู Account type
+
+### เปรียบเทียบ 3 รูปแบบ
+
+| หัวข้อ | Direct | CSP | EA |
+| --- | --- | --- | --- |
+| ผู้ยื่น | ลูกค้าโดยตรง (Admin) | Partner (Direct/Indirect Provider) | Enterprise Admin / Partner Admin (indirect) |
+| Portal หลัก | Azure Portal / M365 Admin Center | Partner Center (+ Azure portal ผ่าน context) | Azure Portal (billing scope: EA) / VL Central |
+| บทบาทที่ต้องใช้ | Billing/Global/Service Support Admin | Admin agent + GDAP (+ RBAC สำหรับ Azure) | Enterprise Admin / Account Owner |
+| Topic / Category | Billing → Refund request | Cancel, Credit or suspend (non-Azure) | Billing → Refund request + ระบุ Enrollment |
+| รูปแบบเครดิต | หัก invoice ถัดไป | Invoice + Reconciliation; Partner ออกให้ลูกค้าต่อ | **Future Azure usage credit** (Code O21), ไม่ใช่เงินสด |
+| เครดิตหมดอายุ | ไม่ปกติ | ไม่ปกติ | **สิ้น enrollment anniversary term** |
+| Deadline (Azure) | 2 เดือน | 2 เดือน | 2 เดือน |
+| Deadline (M365/อื่น) | 1 เดือน | 1 เดือน | 1 เดือน |
+| ครอบคลุม commerce | Legacy + NCE | Legacy + NCE | EA / EAS / SCE |
+
+### EA — สิ่งที่ต่างจาก Direct/CSP
+
+- **Service Credit ≠ cash refund** — เป็นเครดิตใช้กับ Azure consumption ในอนาคตเท่านั้น
+- **Expire เมื่อจบ enrollment anniversary term** ปัจจุบัน (ยื่นช้า → อาจใช้ไม่ทัน)
+- ปรากฏใน usage summary ด้วย **Accounting Code `O21`** — *Service Level Agreement Credit*
+- **EA Indirect**: ลูกค้ายื่นเองไม่ได้ ต้องให้ **LSP / SSP Partner Administrator** เป็นผู้ยื่นผ่าน VL Central หรือ Microsoft Account Team
+
+### Pitfalls ที่พบบ่อย
+
+- CSP **Indirect Reseller** ยื่นเองใน Partner Center → ถูก reject (ต้องให้ Indirect Provider ยื่น)
+- EA **Indirect** ลูกค้ายื่นเองใน Azure Portal → เคสถูกส่งกลับให้ติดต่อ LSP/SSP
+- EA ยื่นช้าจน credit หมดอายุก่อนได้ใช้ (anniversary term ครบ)
+- Direct ใช้ personal email เป็น evidence → ถูก reject ต้องเป็น email จาก tenant domain
+- ใช้ Advisory incident เป็นหลักฐานหลัก → ปกติไม่เข้าเกณฑ์
+
 ## สูตรคำนวณ
 
 ```text
@@ -210,6 +281,12 @@ Monthly Uptime Percentage =
 - [Report a service problem on behalf of a customer — Partner Center](https://learn.microsoft.com/partner-center/customers/report-problems-on-behalf-of-a-customer)
 - [GDAP Least Privileged Roles by Task](https://learn.microsoft.com/partner-center/gdap-least-privileged-roles-by-task)
 - [Partner Center — Create Credit Request (non-Azure) โดยตรง](https://partner.microsoft.com/dashboard/support/servicerequests/create?stage=2&topicid=c65fe2c7-105c-aafc-2f8c-3d3acecb2e4a)
+- [How to check Microsoft 365 service health — Incident vs Advisory, statuses](https://learn.microsoft.com/microsoft-365/enterprise/view-service-health)
+- [Azure Service Health portal — 5 event types](https://learn.microsoft.com/azure/service-health/service-health-portal-update)
+- [Azure Service Health notifications — properties & severities](https://learn.microsoft.com/azure/service-health/service-health-notifications-properties)
+- [Azure EA Pricing — SLA credit process](https://learn.microsoft.com/azure/cost-management-billing/manage/ea-pricing-overview)
+- [EA Usage & credit charges — accounting codes (O21 = SLA Credit)](https://learn.microsoft.com/azure/cost-management-billing/manage/direct-ea-azure-usage-charges-invoices)
+- [VL Central — Credits and transfers (EA / Volume Licensing)](https://learn.microsoft.com/volume-licensing-central/orderworkspace/creditstransfers)
 
 ## โครงสร้างโปรเจกต์
 
